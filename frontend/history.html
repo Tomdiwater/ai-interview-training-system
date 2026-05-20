@@ -1,0 +1,658 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>面试单元 - 历史记录</title>
+    <link rel="stylesheet" href="css/style.css">
+    <style>
+        .history-shell {
+            display: grid;
+            grid-template-columns: minmax(0, 1fr) 300px;
+            gap: 24px;
+            margin-top: 18px;
+        }
+
+        .hero-panel,
+        .history-panel,
+        .side-panel,
+        .history-card,
+        .empty-state,
+        .detail-card {
+            background: var(--surface);
+            backdrop-filter: blur(18px);
+            border: 1px solid rgba(255, 255, 255, 0.64);
+            border-radius: 30px;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .hero-panel,
+        .history-panel,
+        .side-panel,
+        .empty-state,
+        .detail-card {
+            padding: 28px;
+        }
+
+        .hero-panel {
+            position: relative;
+            overflow: hidden;
+            margin-bottom: 22px;
+        }
+
+        .hero-panel::before {
+            content: "";
+            position: absolute;
+            inset: 0;
+            background:
+                radial-gradient(circle at top right, rgba(216, 111, 69, 0.14), transparent 30%),
+                radial-gradient(circle at 15% 18%, rgba(31, 109, 103, 0.12), transparent 24%);
+            pointer-events: none;
+        }
+
+        .hero-panel > * {
+            position: relative;
+            z-index: 1;
+        }
+
+        .hero-panel h1 {
+            margin-top: 18px;
+            font-family: "Noto Serif SC", "Source Han Serif SC", serif;
+            font-size: clamp(36px, 5vw, 56px);
+            line-height: 1.06;
+        }
+
+        .hero-panel p {
+            margin-top: 14px;
+            max-width: 660px;
+            color: var(--text-muted);
+            font-size: 16px;
+        }
+
+        .hero-strip {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 22px;
+        }
+
+        .hero-pill {
+            padding: 10px 14px;
+            border-radius: 999px;
+            background: rgba(255, 255, 255, 0.74);
+            color: var(--text-muted);
+            font-size: 13px;
+            font-weight: 600;
+        }
+
+        .history-panel h2,
+        .side-panel h2,
+        .detail-card h2 {
+            font-size: 18px;
+            margin-bottom: 16px;
+        }
+
+        .history-list {
+            display: grid;
+            gap: 16px;
+        }
+
+        .history-card {
+            padding: 24px;
+            display: grid;
+            grid-template-columns: minmax(0, 1fr) auto;
+            gap: 18px;
+            transition: transform var(--transition), box-shadow var(--transition);
+        }
+
+        .history-card:hover {
+            transform: translateY(-4px);
+            box-shadow: var(--shadow-md);
+        }
+
+        .history-top {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin-bottom: 10px;
+        }
+
+        .history-job-category {
+            font-size: 18px;
+            font-weight: 700;
+        }
+
+        .history-badge {
+            display: inline-flex;
+            align-items: center;
+            padding: 8px 12px;
+            border-radius: 999px;
+            background: rgba(31, 109, 103, 0.1);
+            color: var(--accent-alt);
+            font-size: 12px;
+            font-weight: 700;
+        }
+
+        .history-date,
+        .history-meta {
+            color: var(--text-muted);
+            font-size: 14px;
+        }
+
+        .history-score {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: flex-end;
+            min-width: 84px;
+        }
+
+        .history-score strong {
+            font-size: 38px;
+            line-height: 1;
+            color: var(--accent-deep);
+        }
+
+        .history-score span {
+            margin-top: 8px;
+            color: var(--text-soft);
+            font-size: 12px;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+        }
+
+        .history-actions {
+            margin-top: 14px;
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .detail-card {
+            margin-top: 20px;
+        }
+
+        .detail-block {
+            padding: 18px;
+            border-radius: 22px;
+            background: rgba(255, 255, 255, 0.74);
+            margin-bottom: 14px;
+        }
+
+        .detail-block strong {
+            display: block;
+            margin-bottom: 8px;
+        }
+
+        .detail-block p {
+            color: var(--text-muted);
+            line-height: 1.8;
+            white-space: pre-wrap;
+        }
+
+        .detail-meta {
+            color: var(--text-soft);
+            font-size: 13px;
+            margin-bottom: 14px;
+        }
+
+        .empty-state {
+            text-align: center;
+        }
+
+        .empty-state h3 {
+            font-family: "Noto Serif SC", "Source Han Serif SC", serif;
+            font-size: 28px;
+            margin-bottom: 10px;
+        }
+
+        .empty-state p {
+            color: var(--text-muted);
+            margin-bottom: 20px;
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        .side-panel {
+            display: grid;
+            gap: 14px;
+            align-content: start;
+        }
+
+        .side-item {
+            padding: 16px 18px;
+            border-radius: 20px;
+            background: rgba(255, 255, 255, 0.72);
+        }
+
+        .side-item strong {
+            display: block;
+            margin-bottom: 4px;
+            font-size: 15px;
+        }
+
+        .side-item span {
+            color: var(--text-muted);
+            font-size: 13px;
+            line-height: 1.65;
+        }
+
+        @media (max-width: 980px) {
+            .history-shell {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 720px) {
+            .history-card {
+                grid-template-columns: 1fr;
+            }
+
+            .history-score {
+                align-items: flex-start;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="page-container">
+        <nav class="navbar">
+            <a href="home.html" class="navbar-brand">面试单元</a>
+            <ul class="navbar-nav">
+                <li><a href="home.html" class="nav-link">首页</a></li>
+                <li><a href="job_selection.html" class="nav-link">开始面试</a></li>
+                <li><a href="question_bank.html" class="nav-link">题库</a></li>
+                <li><a href="history.html" class="nav-link active">历史记录</a></li>
+                <li><a href="profile.html" class="nav-link">个人中心</a></li>
+                <li><a href="#" class="nav-link" onclick="logout()">退出登录</a></li>
+            </ul>
+        </nav>
+
+        <div class="content">
+            <div class="history-shell">
+                <div>
+                    <section class="hero-panel">
+                        <div class="eyebrow">Review Archive</div>
+                        <h1>把过往表现摊开来看，才更容易知道下一次该补哪里。</h1>
+                        <p>历史记录现在直接接真实面试记录。你可以先看总分和方向，再点开任意一场查看当时的题目、回答和评分细节。</p>
+                        <div class="hero-strip">
+                            <span class="hero-pill" id="username">访客</span>
+                            <span class="hero-pill">真实历史数据</span>
+                            <span class="hero-pill">支持单场复盘</span>
+                        </div>
+                    </section>
+
+                    <section class="history-panel">
+                        <h2>最近面试记录</h2>
+                        <div class="history-list" id="history-list"></div>
+                        <div class="empty-state hidden" id="empty-state">
+                            <h3>还没有历史记录</h3>
+                            <p>先完成一次正式模拟，这里才会开始积累你的训练轨迹。</p>
+                            <button class="btn-primary" onclick="window.location.href='job_selection.html'">开始第一场面试</button>
+                        </div>
+                        <div class="detail-card hidden" id="detail-card">
+                            <h2>本场复盘</h2>
+                            <div class="detail-meta" id="detail-meta"></div>
+                            <div id="detail-content"></div>
+                        </div>
+                    </section>
+                </div>
+
+                <aside class="side-panel">
+                    <h2>查看建议</h2>
+                    <div class="side-item">
+                        <strong>先看趋势</strong>
+                        <span>先对比同一岗位下几次分数变化，再决定接下来重点练哪类问题。</span>
+                    </div>
+                    <div class="side-item">
+                        <strong>再看内容</strong>
+                        <span>点开单场复盘时，重点看自己回答的空泛处和断点，不只盯总分。</span>
+                    </div>
+                    <div class="side-item">
+                        <strong>最后回题库</strong>
+                        <span>从记录里找到弱项，再去题库补对应岗位的问题，会比盲练有效很多。</span>
+                    </div>
+                </aside>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/auth.js"></script>
+    <script>
+        const API = 'http://127.0.0.1:5000';
+
+        window.onload = async function () {
+            checkLogin();
+            const username = localStorage.getItem('username') || '访客';
+            document.getElementById('username').textContent = `当前账号 · ${username}`;
+            await loadHistory();
+        };
+
+        function scoreLabel(score) {
+            if (score >= 90) return '表现很强';
+            if (score >= 80) return '状态稳定';
+            if (score >= 70) return '继续打磨';
+            return '建议复盘';
+        }
+
+        async function loadHistory() {
+            const userId = localStorage.getItem('user_id');
+            const container = document.getElementById('history-list');
+            const emptyState = document.getElementById('empty-state');
+
+            if (!userId) {
+                container.classList.add('hidden');
+                emptyState.classList.remove('hidden');
+                return;
+            }
+
+            try {
+                const response = await fetch(`${API}/api/history/${userId}`);
+                const data = await response.json();
+                if (!response.ok) throw new Error(data.error || '历史记录加载失败');
+
+                const records = data.records || [];
+                if (!records.length) {
+                    container.classList.add('hidden');
+                    emptyState.classList.remove('hidden');
+                    return;
+                }
+
+                container.classList.remove('hidden');
+                emptyState.classList.add('hidden');
+                container.innerHTML = '';
+
+                records.forEach((record) => {
+                    const card = document.createElement('div');
+                    card.className = 'history-card';
+                    card.innerHTML = `
+                        <div>
+                            <div class="history-top">
+                                <div class="history-job-category">${escapeHtml(record.job_category || '未分类')}</div>
+                                <div class="history-badge">${scoreLabel(Number(record.total_score || 0))}</div>
+                            </div>
+                            <div class="history-date">${formatDate(record.created_at)}</div>
+                            <div class="history-meta">这是一场已保存的正式模拟记录，可以展开看完整复盘。</div>
+                            <div class="history-actions">
+                                <button class="btn-secondary" onclick="loadHistoryDetail(${record.id})">查看详情</button>
+                                <button class="btn-primary" onclick="window.location.href='job_selection.html'">再练一次</button>
+                            </div>
+                        </div>
+                        <div class="history-score">
+                            <strong>${record.total_score ?? '--'}</strong>
+                            <span>Score</span>
+                        </div>
+                    `;
+                    container.appendChild(card);
+                });
+            } catch (error) {
+                console.error('loadHistory error:', error);
+                container.classList.remove('hidden');
+                emptyState.classList.add('hidden');
+                container.innerHTML = `<div class="empty-state"><p>${escapeHtml(error.message)}</p></div>`;
+            }
+        }
+
+        async function loadHistoryDetail(recordId) {
+            const card = document.getElementById('detail-card');
+            const meta = document.getElementById('detail-meta');
+            const content = document.getElementById('detail-content');
+
+            card.classList.remove('hidden');
+            meta.textContent = '正在读取本场详情...';
+            content.innerHTML = '';
+
+            try {
+                const response = await fetch(`${API}/api/history/detail/${recordId}`);
+                const data = await response.json();
+                if (!response.ok) throw new Error(data.error || '详情加载失败');
+
+                const record = data.record || {};
+                meta.textContent = `${escapeHtml(record.job_category || '未分类')} · 总分 ${record.total_score ?? '--'} · ${formatDate(record.created_at)}`;
+
+                const questions = Array.isArray(record.questions) ? record.questions : [];
+                const answers = Array.isArray(record.answers) ? record.answers : [];
+                const scores = Array.isArray(record.scores) ? record.scores : [];
+
+                content.innerHTML = questions.map((question, index) => `
+                    <div class="detail-block">
+                        <strong>问题 ${index + 1}</strong>
+                        <p>${escapeHtml(question.question || question.text || '无题目内容')}</p>
+                    </div>
+                    <div class="detail-block">
+                        <strong>你的回答</strong>
+                        <p>${escapeHtml(answers[index] || '未作答')}</p>
+                    </div>
+                    <div class="detail-block">
+                        <strong>评分摘要</strong>
+                        <p>${escapeHtml(summarizeScore(scores[index], answers[index], question.question || question.text || ''))}</p>
+                    </div>
+                `).join('');
+
+                if (!questions.length) {
+                    content.innerHTML = '<div class="detail-block"><p>这场记录里暂时没有可展示的题目详情。</p></div>';
+                }
+                card.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            } catch (error) {
+                console.error('loadHistoryDetail error:', error);
+                meta.textContent = '详情读取失败';
+                content.innerHTML = `<div class="detail-block"><p>${escapeHtml(error.message)}</p></div>`;
+            }
+        }
+
+        function summarizeScore(score, answerText = '', questionText = '') {
+            const answer = String(answerText || '').trim();
+            const question = String(questionText || '').trim();
+
+            if (!score) return buildFallbackReview(null, answer, question);
+            if (typeof score === 'string') return score;
+
+            const total = pickNumber(score, ['total_score', '得分', 'score']);
+            const content = pickNumber(score, ['content_score', '内容完整度', 'content']);
+            const keyword = pickNumber(score, ['keyword_score', '关键词匹配', 'keyword']);
+            const logic = pickNumber(score, ['logic_score', '逻辑性', 'logic']);
+            const feedback = pickText(score, ['feedback', 'comment', '点评', '评价']);
+            const normalized = Number.isFinite(total) ? total : estimateScoreFromAnswer(answer);
+            const metrics = [
+                { key: 'content', name: '内容完整度', value: content },
+                { key: 'keyword', name: '关键词匹配', value: keyword },
+                { key: 'logic', name: '逻辑性', value: logic }
+            ].filter((item) => Number.isFinite(item.value));
+
+            const parts = [];
+            parts.push(buildLevelLine(normalized, answer, question));
+
+            if (metrics.length) parts.push(buildDimensionLine(metrics, normalized, answer, question));
+            else parts.push(buildAnswerLine(answer, normalized));
+
+            parts.push(buildSuggestionLine(answer, question, normalized, metrics));
+            if (feedback && feedback.length <= 80) parts.push(feedback);
+
+            if (!parts.length) {
+                return buildFallbackReview(total, answer, question);
+            }
+
+            return parts.filter(Boolean).join(' ');
+        }
+
+        function buildFallbackReview(totalScore, answer, question) {
+            const score = Number(totalScore);
+            const normalized = Number.isFinite(score) ? score : estimateScoreFromAnswer(answer);
+            return [
+                buildLevelLine(normalized, answer, question),
+                buildAnswerLine(answer, normalized),
+                buildSuggestionLine(answer, question, normalized, [])
+            ].filter(Boolean).join(' ');
+        }
+
+        function buildLevelLine(score, answer, question) {
+            const type = getQuestionType(question);
+            const seed = `${question}|${answer}|${Math.round(score)}`;
+            const byBand = score >= 85 ? [
+                '这题答得比较稳，主线清楚，信息也没有散。',
+                '这一题的完成度不错，能看出你知道该从哪里切入。',
+                type === 'technical' ? '技术点交代得比较顺，整体不像临时拼答案。' : '回答的方向是对的，表达也比较顺。'
+            ] : score >= 70 ? [
+                '这题基础是有的，但还差一点让人信服的细节。',
+                '整体方向没有跑偏，只是展开得还不够扎实。',
+                type === 'experience' ? '经历线索已经说出来了，但结果和个人贡献还可以再明一点。' : '回答能覆盖主要意思，但亮点还不够突出。'
+            ] : score >= 55 ? [
+                '这题能看出一些思路，不过答案还偏散。',
+                '你提到了相关内容，但还没有把它们组织成一个完整回答。',
+                type === 'technical' ? '概念有碰到，但原理、边界或应用场景还需要补上。' : '回答有起点，但支撑材料还偏少。'
+            ] : [
+                '这题目前比较吃亏，主要是有效信息太少。',
+                '系统能抓到的内容不多，所以分数会被明显拉低。',
+                '这题还需要重新组织，先把核心观点说清楚。'
+            ];
+            return pickStable(byBand, seed);
+        }
+
+        function buildDimensionLine(metrics, score, answer, question) {
+            const sorted = [...metrics].sort((a, b) => a.value - b.value);
+            const weakest = sorted[0];
+            const strongest = sorted[sorted.length - 1];
+            const seed = `${question}|${answer}|${weakest.key}|${strongest.key}`;
+
+            if (weakest.value <= 55) {
+                const weakMap = {
+                    content: [
+                        '最明显的短板在内容完整度，结论后面的依据还不够。',
+                        '内容这一项拖了后腿，回答里缺少过程、例子或落地结果。'
+                    ],
+                    keyword: [
+                        '关键词命中偏少，说明回答还没有贴住题目真正考察的点。',
+                        '这题需要补一些关键概念或岗位词，否则容易显得泛泛而谈。'
+                    ],
+                    logic: [
+                        '逻辑性偏弱，建议把顺序改成“结论-理由-例子”。',
+                        '表达顺序还有点跳，面试官可能需要自己帮你串起来。'
+                    ]
+                };
+                return pickStable(weakMap[weakest.key], seed);
+            }
+
+            if (score >= 80 && strongest.value >= 80) {
+                const strongMap = {
+                    content: [
+                        '内容覆盖比较充分，这是这题最加分的地方。',
+                        '内容完整度表现最好，说明你的回答不是只停在表层。'
+                    ],
+                    keyword: [
+                        '关键词抓得比较准，回答和题目要求贴合度不错。',
+                        '题目里的关键方向基本接住了，这一点比较加分。'
+                    ],
+                    logic: [
+                        '逻辑线比较清楚，听起来不费劲。',
+                        '结构感是这题的优势，回答顺序比较自然。'
+                    ]
+                };
+                return pickStable(strongMap[strongest.key], seed);
+            }
+
+            return pickStable([
+                `分项里 ${weakest.name} 相对弱一些，可以优先补这一块。`,
+                `三个维度差距不算大，但 ${weakest.name} 还有提升空间。`,
+                `目前不是单点失误，主要是 ${weakest.name} 和具体支撑还可以再加强。`
+            ], seed);
+        }
+
+        function buildAnswerLine(answer, score) {
+            const length = answer.length;
+            const weakHits = countWeakWords(answer);
+            if (!answer) return '这题当时没有留下有效回答，后续复盘时建议重新答一版。';
+            if (weakHits >= 2) return '回答里有一些犹豫或模糊表达，会影响整体观感。';
+            if (length < 12) return '回答太短，基本只能看出态度，看不出能力细节。';
+            if (length < 50) return score >= 70 ? '篇幅不长但有重点，下次可以补一个例子。' : '回答有开头，但很多判断还没有展开。';
+            return score >= 80 ? '回答长度够用，后面可以继续提高信息密度。' : '篇幅是够的，问题更多在结构和重点取舍。';
+        }
+
+        function buildSuggestionLine(answer, question, score, metrics) {
+            const weakest = metrics.length ? [...metrics].sort((a, b) => a.value - b.value)[0] : null;
+            if (countWeakWords(answer) >= 2) return '下次先停一秒想好主句，再开始说，会比边想边补更稳。';
+            if (weakest?.key === 'keyword') return '复盘时先圈出题干里的关键词，再把答案往这些点上靠。';
+            if (weakest?.key === 'logic') return '建议先写一个三段式提纲，再用口语把它讲出来。';
+            if (weakest?.key === 'content') return '下次至少补一个具体经历、数据或结果，让回答更有落点。';
+            if (/项目|实习|经历|负责|团队/.test(question)) return '这类题可以按“背景-职责-动作-结果”来答，把你的个人贡献说清楚。';
+            if (/算法|技术|原理|结构|数据库|缓存|网络|框架|接口/.test(question)) return '技术题建议按“定义-原理-场景-限制”来答，别只给概念。';
+            if (/设计|用户|产品|体验|需求/.test(question)) return '产品或设计类题目要把用户、场景和取舍讲出来。';
+            return score >= 80 ? '下一次可以补一个更具体的例子，让优势更明显。' : '下次先给明确结论，再补两条理由和一个例子。';
+        }
+
+        function getQuestionType(question) {
+            if (/项目|实习|经历|负责|团队/.test(question)) return 'experience';
+            if (/算法|技术|原理|结构|数据库|缓存|网络|框架|接口/.test(question)) return 'technical';
+            if (/设计|用户|产品|体验|需求/.test(question)) return 'product';
+            return 'general';
+        }
+
+        function countWeakWords(text) {
+            const weakPattern = /(不知道|不会|没想过|不清楚|随便|嗯|啊|额|这个|那个)/g;
+            return (String(text || '').match(weakPattern) || []).length;
+        }
+
+        function pickStable(options, seedText) {
+            if (!options.length) return '';
+            let hash = 0;
+            for (let i = 0; i < seedText.length; i += 1) {
+                hash = (hash * 31 + seedText.charCodeAt(i)) >>> 0;
+            }
+            return options[hash % options.length];
+        }
+
+        function estimateScoreFromAnswer(answer) {
+            const text = String(answer || '').trim();
+            if (!text) return 40;
+            const weakHits = countWeakWords(text);
+            let score = 68;
+            if (text.length < 12) score -= 18;
+            else if (text.length < 50) score -= 8;
+            else score += 6;
+            score -= weakHits * 6;
+            return Math.max(35, Math.min(88, score));
+        }
+
+        function pickNumber(source, keys) {
+            for (const key of keys) {
+                const value = source?.[key];
+                const number = Number(value);
+                if (Number.isFinite(number)) return number;
+            }
+            return null;
+        }
+
+        function pickText(source, keys) {
+            for (const key of keys) {
+                const value = source?.[key];
+                if (typeof value === 'string' && value.trim()) return value.trim();
+            }
+            return '';
+        }
+
+        function formatDate(value) {
+            if (!value) return '时间未知';
+            const date = new Date(value);
+            if (Number.isNaN(date.getTime())) return String(value);
+            return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')} ${String(date.getHours()).padStart(2, '0')}:${String(date.getMinutes()).padStart(2, '0')}`;
+        }
+
+        function escapeHtml(text) {
+            return String(text)
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;')
+                .replace(/'/g, '&#39;');
+        }
+
+        function logout() {
+            localStorage.removeItem('user_id');
+            localStorage.removeItem('username');
+            window.location.href = '/frontend/index.html';
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,10 @@
+Flask
+Flask-CORS
+PyMySQL
+bcrypt
+websocket-client
+pyaudio
+requests
+numpy
+opencv-python
+cryptography

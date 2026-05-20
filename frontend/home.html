@@ -1,0 +1,543 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>面试单元 - 首页</title>
+    <link rel="stylesheet" href="css/style.css">
+    <style>
+        .hero {
+            display: grid;
+            grid-template-columns: minmax(0, 1.3fr) minmax(320px, 0.7fr);
+            gap: 24px;
+            margin-top: 18px;
+            margin-bottom: 26px;
+        }
+
+        .hero-main,
+        .hero-side,
+        .module-card,
+        .stat-card,
+        .quick-panel {
+            background: var(--surface);
+            backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.64);
+            border-radius: 30px;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .hero-main {
+            padding: 34px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero-main::before {
+            content: "";
+            position: absolute;
+            inset: 0;
+            background:
+                radial-gradient(circle at top right, rgba(216, 111, 69, 0.14), transparent 28%),
+                radial-gradient(circle at 18% 18%, rgba(31, 109, 103, 0.1), transparent 22%);
+            pointer-events: none;
+        }
+
+        .hero-main > * {
+            position: relative;
+            z-index: 1;
+        }
+
+        .eyebrow {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            padding: 8px 14px;
+            border-radius: 999px;
+            background: var(--accent-soft);
+            color: var(--accent-deep);
+            font-size: 12px;
+            font-weight: 700;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+        }
+
+        .hero-main h1 {
+            margin-top: 20px;
+            max-width: 760px;
+            font-family: "Noto Serif SC", "Source Han Serif SC", serif;
+            font-size: clamp(40px, 5vw, 64px);
+            line-height: 1.04;
+            letter-spacing: 0.01em;
+        }
+
+        .hero-main p {
+            margin-top: 18px;
+            max-width: 640px;
+            font-size: 17px;
+            color: var(--text-muted);
+        }
+
+        .hero-actions {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 14px;
+            margin-top: 28px;
+        }
+
+        .hero-actions .btn-primary,
+        .hero-actions .btn-secondary {
+            width: auto;
+            min-width: 160px;
+        }
+
+        .hero-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 28px;
+        }
+
+        .hero-tag {
+            padding: 10px 14px;
+            border-radius: 999px;
+            background: rgba(255, 255, 255, 0.7);
+            color: var(--text-muted);
+            font-size: 13px;
+            font-weight: 600;
+        }
+
+        .hero-side {
+            padding: 28px;
+            display: flex;
+            flex-direction: column;
+            gap: 18px;
+            justify-content: space-between;
+        }
+
+        .side-header h3 {
+            font-size: 14px;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            color: var(--text-soft);
+        }
+
+        .side-header p {
+            margin-top: 10px;
+            font-size: 24px;
+            line-height: 1.3;
+            font-weight: 700;
+        }
+
+        .focus-list {
+            display: grid;
+            gap: 12px;
+        }
+
+        .focus-item {
+            padding: 16px 18px;
+            border-radius: 20px;
+            background: rgba(255, 255, 255, 0.68);
+        }
+
+        .focus-item strong {
+            display: block;
+            margin-bottom: 4px;
+            font-size: 15px;
+        }
+
+        .focus-item span {
+            color: var(--text-muted);
+            font-size: 13px;
+        }
+
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(4, minmax(0, 1fr));
+            gap: 18px;
+            margin-bottom: 24px;
+        }
+
+        .stat-card {
+            padding: 24px;
+        }
+
+        .stat-label {
+            color: var(--text-soft);
+            font-size: 13px;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+        }
+
+        .stat-value {
+            display: block;
+            margin-top: 10px;
+            font-size: clamp(32px, 3vw, 44px);
+            font-weight: 700;
+            line-height: 1;
+        }
+
+        .stat-hint {
+            margin-top: 10px;
+            color: var(--text-muted);
+            font-size: 13px;
+        }
+
+        .modules-section {
+            display: grid;
+            grid-template-columns: minmax(0, 1fr) 320px;
+            gap: 24px;
+        }
+
+        .modules-grid {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 18px;
+        }
+
+        .module-card {
+            padding: 28px;
+            cursor: pointer;
+            transition: transform var(--transition), box-shadow var(--transition), border-color var(--transition);
+        }
+
+        .module-card:hover {
+            transform: translateY(-4px);
+            box-shadow: var(--shadow-md);
+        }
+
+        .module-icon {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 52px;
+            height: 52px;
+            border-radius: 18px;
+            background: var(--accent-soft);
+            color: var(--accent-deep);
+            font-size: 24px;
+            font-weight: 700;
+        }
+
+        .module-card h3 {
+            margin-top: 20px;
+            font-size: 24px;
+            font-family: "Noto Serif SC", "Source Han Serif SC", serif;
+        }
+
+        .module-card p {
+            margin-top: 12px;
+            color: var(--text-muted);
+        }
+
+        .module-meta {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 20px;
+            color: var(--text-soft);
+            font-size: 13px;
+        }
+
+        .quick-panel {
+            padding: 24px;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .quick-panel h3 {
+            font-family: "Noto Serif SC", "Source Han Serif SC", serif;
+            font-size: 28px;
+            line-height: 1.2;
+        }
+
+        .quick-panel p {
+            color: var(--text-muted);
+        }
+
+        .quick-action-btn {
+            width: 100%;
+            justify-content: flex-start;
+            min-height: 56px;
+            padding: 0 18px;
+            border: 1px solid rgba(24, 32, 29, 0.1);
+            border-radius: 18px;
+            background: rgba(255, 255, 255, 0.72);
+            color: var(--text);
+            font-weight: 700;
+            cursor: pointer;
+            transition: transform var(--transition), box-shadow var(--transition), border-color var(--transition);
+        }
+
+        .quick-action-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-sm);
+            border-color: rgba(216, 111, 69, 0.24);
+        }
+
+        .section-head {
+            display: flex;
+            justify-content: space-between;
+            align-items: end;
+            gap: 18px;
+            margin-bottom: 16px;
+        }
+
+        .section-head p {
+            max-width: 520px;
+            color: var(--text-muted);
+        }
+
+        @media (max-width: 1024px) {
+            .hero,
+            .modules-section {
+                grid-template-columns: 1fr;
+            }
+
+            .stats,
+            .modules-grid {
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+            }
+        }
+
+        @media (max-width: 640px) {
+            .hero-main,
+            .hero-side,
+            .module-card,
+            .quick-panel,
+            .stat-card {
+                padding: 22px;
+                border-radius: 24px;
+            }
+
+            .stats,
+            .modules-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .section-head {
+                align-items: flex-start;
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="page-container">
+        <nav class="navbar">
+            <a href="home.html" class="navbar-brand">面试单元</a>
+            <ul class="navbar-nav">
+                <li><span id="username" class="user-chip"></span></li>
+                <li><a href="home.html" class="nav-link active">首页</a></li>
+                <li><a href="job_selection.html" class="nav-link">开始面试</a></li>
+                <li><a href="question_bank.html" class="nav-link">题库</a></li>
+                <li><a href="history.html" class="nav-link">历史记录</a></li>
+                <li><a href="profile.html" class="nav-link">个人中心</a></li>
+                <li><a href="#" class="nav-link" onclick="logout()">退出登录</a></li>
+            </ul>
+        </nav>
+
+        <main class="content">
+            <section class="hero fade-in">
+                <div class="hero-main">
+                    <span class="eyebrow">Personal Interview Workspace</span>
+                    <h1>欢迎回来，<span id="welcome-username"></span>。今天想把哪一种能力练得更稳一点？</h1>
+                    <p>你可以直接开始一次新的模拟面试，也可以从历史记录和题库里接着上次的练习继续看。</p>
+                    <div class="hero-actions">
+                        <button class="btn-primary" onclick="window.location.href='job_selection.html'">开始一次新面试</button>
+                        <button class="btn-secondary" onclick="window.location.href='history.html'">查看历史表现</button>
+                    </div>
+                    <div class="hero-tags">
+                        <span class="hero-tag">岗位定向训练</span>
+                        <span class="hero-tag">即时反馈</span>
+                        <span class="hero-tag">成长轨迹可见</span>
+                    </div>
+                </div>
+
+                <aside class="hero-side">
+                    <div class="side-header">
+                        <h3>今日关注</h3>
+                        <p>把练习从“刷过”变成“进步过”。</p>
+                    </div>
+                    <div class="focus-list">
+                        <div class="focus-item">
+                            <strong>先热身</strong>
+                            <span>从题库随机抽一题，快速进入表达状态。</span>
+                        </div>
+                        <div class="focus-item">
+                            <strong>再做模拟</strong>
+                            <span>选择岗位后进行完整的问答演练，建立节奏感。</span>
+                        </div>
+                        <div class="focus-item">
+                            <strong>最后复盘</strong>
+                            <span>对照历史分数，看清楚是否真的在稳定提升。</span>
+                        </div>
+                    </div>
+                </aside>
+            </section>
+
+            <section class="stats fade-in">
+                <div class="stat-card">
+                    <span class="stat-label">已完成面试</span>
+                    <strong class="stat-value" id="interview-count">0</strong>
+                    <div class="stat-hint">累计完成的模拟场次</div>
+                </div>
+                <div class="stat-card">
+                    <span class="stat-label">平均得分</span>
+                    <strong class="stat-value" id="average-score">0</strong>
+                    <div class="stat-hint">整体表现的稳定程度</div>
+                </div>
+                <div class="stat-card">
+                    <span class="stat-label">最高得分</span>
+                    <strong class="stat-value" id="highest-score">0</strong>
+                    <div class="stat-hint">目前最好的单次表现</div>
+                </div>
+                <div class="stat-card">
+                    <span class="stat-label">学习天数</span>
+                    <strong class="stat-value" id="learning-days">0</strong>
+                    <div class="stat-hint">持续投入带来的积累</div>
+                </div>
+            </section>
+
+            <section class="modules-section fade-in">
+                <div>
+                    <div class="section-head">
+                        <div class="section-title">
+                            <h2>你可以从这里继续</h2>
+                            <p>常用入口放在这里，方便开始练习、查看记录和整理题目。</p>
+                        </div>
+                    </div>
+                    <div class="modules-grid">
+                        <div class="module-card" onclick="window.location.href='job_selection.html'">
+                            <span class="module-icon">01</span>
+                            <h3>开始面试</h3>
+                            <p>按岗位类型进入一次完整模拟，得到更有针对性的表现反馈。</p>
+                            <div class="module-meta">
+                                <span>进入训练</span>
+                                <span>实时问答</span>
+                            </div>
+                        </div>
+                        <div class="module-card" onclick="window.location.href='question_bank.html'">
+                            <span class="module-icon">02</span>
+                            <h3>浏览题库</h3>
+                            <p>先做针对性准备，提前熟悉高频问题、回答结构和重点考察点。</p>
+                            <div class="module-meta">
+                                <span>查看题目</span>
+                                <span>知识沉淀</span>
+                            </div>
+                        </div>
+                        <div class="module-card" onclick="window.location.href='history.html'">
+                            <span class="module-icon">03</span>
+                            <h3>历史记录</h3>
+                            <p>回看之前每次模拟的结果，判断自己是在偶然发挥还是稳定提升。</p>
+                            <div class="module-meta">
+                                <span>复盘记录</span>
+                                <span>趋势判断</span>
+                            </div>
+                        </div>
+                        <div class="module-card" onclick="window.location.href='profile.html'">
+                            <span class="module-icon">04</span>
+                            <h3>个人中心</h3>
+                            <p>维护个人信息和训练偏好，让整个系统更贴近你的使用习惯。</p>
+                            <div class="module-meta">
+                                <span>管理资料</span>
+                                <span>个性设置</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <aside class="quick-panel">
+                    <span class="badge badge-primary">Quick Start</span>
+                    <h3>不想思考路径时，就从这里直接开始。</h3>
+                    <p>保留快速操作，但把它做成更轻巧、更有秩序感的侧边面板。</p>
+                    <button class="quick-action-btn" onclick="window.location.href='job_selection.html'">立即开始一次新面试</button>
+                    <button class="quick-action-btn" onclick="window.location.href='question_bank.html'">随机挑一题先热身</button>
+                    <button class="quick-action-btn" onclick="window.location.href='history.html'">查看最近一次表现</button>
+                </aside>
+            </section>
+        </main>
+    </div>
+
+    <script src="js/auth.js"></script>
+    <script>
+        window.onload = function () {
+            const userId = checkLogin();
+            const username = localStorage.getItem('username') || '同学';
+
+            document.getElementById('username').textContent = username;
+            document.getElementById('welcome-username').textContent = username;
+
+            loadUserStats(userId);
+        };
+
+        async function loadUserStats(userId) {
+            try {
+                const response = await fetch(`http://127.0.0.1:5000/api/history/${userId}`);
+                if (!response.ok) {
+                    setDefaultStats();
+                    return;
+                }
+
+                const data = await response.json();
+                const records = data.records || [];
+                const interviewCount = records.length;
+                let totalScore = 0;
+                let highestScore = 0;
+
+                records.forEach((record) => {
+                    const score = Number(record.total_score) || 0;
+                    totalScore += score;
+                    highestScore = Math.max(highestScore, score);
+                });
+
+                const averageScore = interviewCount > 0 ? Math.round(totalScore / interviewCount) : 0;
+                const learningDays = interviewCount > 0 ? Math.max(1, Math.ceil(interviewCount / 2)) : 0;
+
+                animateValue('interview-count', interviewCount);
+                animateValue('average-score', averageScore);
+                animateValue('highest-score', highestScore);
+                animateValue('learning-days', learningDays);
+            } catch (error) {
+                console.error('加载统计数据失败:', error);
+                setDefaultStats();
+            }
+        }
+
+        function setDefaultStats() {
+            ['interview-count', 'average-score', 'highest-score', 'learning-days'].forEach((id) => {
+                document.getElementById(id).textContent = '0';
+            });
+        }
+
+        function animateValue(id, end) {
+            const element = document.getElementById(id);
+            const start = 0;
+            const range = end - start;
+
+            if (range === 0) {
+                element.textContent = '0';
+                return;
+            }
+
+            const duration = 900;
+            const stepTime = Math.max(Math.floor(duration / Math.abs(range)), 30);
+            let current = start;
+
+            const timer = setInterval(() => {
+                current += 1;
+                element.textContent = current;
+                if (current >= end) {
+                    clearInterval(timer);
+                }
+            }, stepTime);
+        }
+
+        function logout() {
+            localStorage.removeItem('user_id');
+            localStorage.removeItem('username');
+            window.location.href = '/frontend/index.html';
+        }
+    </script>
+</body>
+</html>

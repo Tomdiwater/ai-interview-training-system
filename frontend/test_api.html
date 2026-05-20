@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>API测试</title>
+</head>
+<body>
+    <h1>API测试</h1>
+    <button onclick="runTests()">运行测试</button>
+    <div id="output"></div>
+
+    <script src="test_script.js"></script>
+    <script>
+        function runTests() {
+            const output = document.getElementById('output');
+            output.innerHTML = '测试中...';
+            
+            // 重定向console.log到页面
+            const originalLog = console.log;
+            console.log = function(...args) {
+                originalLog.apply(console, args);
+                output.innerHTML += '<br>' + args.join(' ');
+            };
+            
+            const originalError = console.error;
+            console.error = function(...args) {
+                originalError.apply(console, args);
+                output.innerHTML += '<br><span style="color: red;">' + args.join(' ') + '</span>';
+            };
+            
+            // 运行测试
+            testGetApiBaseUrl();
+            testLogin();
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,357 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>面试单元 - 评估结果</title>
+    <link rel="stylesheet" href="css/style.css">
+    <style>
+        .result-shell {
+            width: min(1080px, 100%);
+            margin: 18px auto 0;
+        }
+
+        .result-hero,
+        .question-score-card,
+        .improvement-section {
+            background: var(--surface);
+            backdrop-filter: blur(18px);
+            border: 1px solid rgba(255, 255, 255, 0.64);
+            border-radius: 30px;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .result-hero {
+            padding: 34px;
+            position: relative;
+            overflow: hidden;
+            margin-bottom: 24px;
+        }
+
+        .result-hero::before {
+            content: "";
+            position: absolute;
+            inset: 0;
+            background:
+                radial-gradient(circle at top right, rgba(216, 111, 69, 0.16), transparent 30%),
+                radial-gradient(circle at 18% 18%, rgba(31, 109, 103, 0.12), transparent 24%);
+            pointer-events: none;
+        }
+
+        .result-hero > * {
+            position: relative;
+            z-index: 1;
+        }
+
+        .result-hero h1 {
+            font-family: "Noto Serif SC", "Source Han Serif SC", serif;
+            font-size: clamp(38px, 5vw, 60px);
+            line-height: 1.06;
+        }
+
+        .result-hero p {
+            margin-top: 14px;
+            max-width: 680px;
+            color: var(--text-muted);
+        }
+
+        .score-board {
+            display: grid;
+            grid-template-columns: 220px minmax(0, 1fr);
+            gap: 24px;
+            align-items: center;
+            margin-top: 26px;
+        }
+
+        .score-ring {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            min-height: 220px;
+            border-radius: 28px;
+            background: linear-gradient(135deg, rgba(216, 111, 69, 0.15), rgba(31, 109, 103, 0.12));
+            border: 1px solid rgba(24, 32, 29, 0.08);
+        }
+
+        .score-ring span {
+            font-size: 74px;
+            line-height: 1;
+            font-weight: 800;
+            color: var(--accent-deep);
+        }
+
+        .score-ring small {
+            margin-top: 12px;
+            color: var(--text-soft);
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+        }
+
+        .score-summary h2 {
+            font-size: 28px;
+            margin-bottom: 10px;
+        }
+
+        .score-summary p {
+            color: var(--text-muted);
+            line-height: 1.8;
+        }
+
+        .question-scores {
+            display: grid;
+            gap: 18px;
+            margin-bottom: 24px;
+        }
+
+        .question-score-card,
+        .improvement-section {
+            padding: 28px;
+        }
+
+        .question-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 14px;
+            flex-wrap: wrap;
+            margin-bottom: 18px;
+        }
+
+        .question-number {
+            font-size: 18px;
+            font-weight: 700;
+        }
+
+        .question-score {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            min-width: 74px;
+            min-height: 42px;
+            padding: 0 16px;
+            border-radius: 999px;
+            background: linear-gradient(135deg, #d86f45, #1f6d67);
+            color: #fff8f2;
+            font-weight: 800;
+        }
+
+        .question-content {
+            font-size: 17px;
+            line-height: 1.8;
+            margin-bottom: 18px;
+        }
+
+        .answer-grid {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 16px;
+            margin-bottom: 18px;
+        }
+
+        .answer-block {
+            padding: 18px;
+            border-radius: 22px;
+            background: rgba(255, 255, 255, 0.72);
+        }
+
+        .answer-block h4 {
+            margin-bottom: 10px;
+            color: var(--text-soft);
+            font-size: 12px;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+        }
+
+        .answer-block p {
+            color: var(--text);
+            line-height: 1.8;
+        }
+
+        .score-details {
+            display: grid;
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            gap: 14px;
+        }
+
+        .score-item {
+            padding: 18px;
+            border-radius: 22px;
+            background: rgba(255, 255, 255, 0.7);
+            text-align: center;
+        }
+
+        .score-item-label {
+            color: var(--text-soft);
+            font-size: 12px;
+            letter-spacing: 0.06em;
+            text-transform: uppercase;
+        }
+
+        .score-item-value {
+            margin-top: 10px;
+            font-size: 24px;
+            font-weight: 800;
+            color: var(--accent-alt);
+        }
+
+        .improvement-section h3 {
+            font-size: 20px;
+            margin-bottom: 16px;
+        }
+
+        .improvement-section ul {
+            padding-left: 20px;
+            color: var(--text-muted);
+            line-height: 1.9;
+        }
+
+        .button-area {
+            display: flex;
+            justify-content: center;
+            gap: 14px;
+            margin-top: 28px;
+            flex-wrap: wrap;
+        }
+
+        @media (max-width: 900px) {
+            .score-board {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 720px) {
+            .answer-grid,
+            .score-details {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="page-container">
+        <nav class="navbar">
+            <a href="home.html" class="navbar-brand">面试单元</a>
+            <ul class="navbar-nav">
+                <li><a href="home.html" class="nav-link">首页</a></li>
+                <li><a href="job_selection.html" class="nav-link">再次面试</a></li>
+                <li><a href="question_bank.html" class="nav-link">题库</a></li>
+                <li><a href="history.html" class="nav-link">历史记录</a></li>
+                <li><a href="profile.html" class="nav-link">个人中心</a></li>
+                <li><a href="#" class="nav-link" onclick="logout()">退出登录</a></li>
+            </ul>
+        </nav>
+
+        <div class="content">
+            <div class="result-shell">
+                <section class="result-hero">
+                    <h1>这次结果不只是一个分数，而是一份复盘起点。</h1>
+                    <p>这里会汇总得分、反馈和答题明细，方便你决定下一次先补哪一块。</p>
+
+                    <div class="score-board">
+                        <div class="score-ring">
+                            <span id="total-score">--</span>
+                            <small>Total Score</small>
+                        </div>
+                        <div class="score-summary">
+                            <h2>整体反馈</h2>
+                            <p id="score-feedback">正在生成本次评估摘要。</p>
+                        </div>
+                    </div>
+                </section>
+
+                <div class="question-scores" id="question-scores"></div>
+
+                <section class="improvement-section">
+                    <h3>接下来怎么继续练</h3>
+                    <ul>
+                        <li>回答时先给结论，再补过程和案例，会比线性叙述更有说服力。</li>
+                        <li>如果某题答得虚，可以回题库按岗位方向重新组织一版更具体的表达。</li>
+                        <li>多用真实项目、实习或复盘经历支撑观点，能显著提升回答可信度。</li>
+                        <li>不要只看总分，更要关注哪一题掉分明显，那才是下次最值得补的地方。</li>
+                    </ul>
+                </section>
+
+                <div class="button-area">
+                    <button class="btn-secondary" onclick="window.location.href='/frontend/job_selection.html'">再来一次</button>
+                    <button class="btn-primary" onclick="window.location.href='/frontend/home.html'">返回首页</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/auth.js"></script>
+    <script>
+        window.onload = function () {
+            checkLogin();
+            loadResult();
+        };
+
+        function getFeedback(score) {
+            if (score >= 90) return '优秀。你的回答完成度和表达稳定性都很强，可以继续保持这种结构和细节。';
+            if (score >= 70) return '良好。整体思路是顺的，但还有一些细节可以再往“更具体、更有案例支撑”推进。';
+            if (score >= 60) return '及格。你已经具备基本回答能力，但在深度、结构或表达节奏上还有明显提升空间。';
+            return '当前还需要继续打磨。建议先从最薄弱的题型入手，把空泛表达替换成更具体的项目经历。';
+        }
+
+        function loadResult() {
+            const result = localStorage.getItem('interview_result');
+            if (!result) {
+                window.location.href = '/frontend/home.html';
+                return;
+            }
+
+            const data = JSON.parse(result);
+            document.getElementById('total-score').textContent = data.total_score ?? '--';
+            document.getElementById('score-feedback').textContent = getFeedback(Number(data.total_score || 0));
+
+            const container = document.getElementById('question-scores');
+            container.innerHTML = '';
+
+            (data.scores || []).forEach((score, index) => {
+                const card = document.createElement('div');
+                card.className = 'question-score-card';
+                card.innerHTML = `
+                    <div class="question-header">
+                        <div class="question-number">问题 ${index + 1}</div>
+                        <div class="question-score">${score.total_score ?? '--'}</div>
+                    </div>
+                    <div class="question-content">${score.question || '未提供题目内容'}</div>
+                    <div class="answer-grid">
+                        <div class="answer-block">
+                            <h4>你的回答</h4>
+                            <p>${score.user_answer || '未作答'}</p>
+                        </div>
+                        <div class="answer-block">
+                            <h4>参考答案</h4>
+                            <p>${score.correct_answer || '暂无参考答案'}</p>
+                        </div>
+                    </div>
+                    <div class="score-details">
+                        <div class="score-item">
+                            <div class="score-item-label">内容完整度</div>
+                            <div class="score-item-value">${score.content_score ?? '--'}</div>
+                        </div>
+                        <div class="score-item">
+                            <div class="score-item-label">关键词匹配</div>
+                            <div class="score-item-value">${score.keyword_score ?? '--'}</div>
+                        </div>
+                        <div class="score-item">
+                            <div class="score-item-label">逻辑性</div>
+                            <div class="score-item-value">${score.logic_score ?? '--'}</div>
+                        </div>
+                    </div>
+                `;
+                container.appendChild(card);
+            });
+        }
+
+        function logout() {
+            localStorage.removeItem('user_id');
+            localStorage.removeItem('username');
+            localStorage.removeItem('interview_result');
+            window.location.href = '/frontend/index.html';
+        }
+    </script>
+</body>
+</html>

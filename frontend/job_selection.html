@@ -1,0 +1,408 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>面试单元 - 选择岗位</title>
+    <link rel="stylesheet" href="css/style.css">
+    <style>
+        .selection-shell {
+            display: grid;
+            grid-template-columns: minmax(0, 1.12fr) 320px;
+            gap: 24px;
+            margin-top: 18px;
+        }
+
+        .hero-panel,
+        .category-panel,
+        .side-panel,
+        .job-card {
+            background: var(--surface);
+            backdrop-filter: blur(18px);
+            border: 1px solid rgba(255, 255, 255, 0.64);
+            border-radius: 30px;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .hero-panel,
+        .category-panel,
+        .side-panel {
+            padding: 30px;
+        }
+
+        .hero-panel {
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero-panel::before {
+            content: "";
+            position: absolute;
+            inset: 0;
+            background:
+                radial-gradient(circle at top right, rgba(216, 111, 69, 0.14), transparent 30%),
+                radial-gradient(circle at 18% 18%, rgba(31, 109, 103, 0.12), transparent 24%);
+            pointer-events: none;
+        }
+
+        .hero-panel > * {
+            position: relative;
+            z-index: 1;
+        }
+
+        .eyebrow {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            padding: 8px 14px;
+            border-radius: 999px;
+            background: var(--accent-soft);
+            color: var(--accent-deep);
+            font-size: 12px;
+            font-weight: 700;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+        }
+
+        .hero-panel h1 {
+            margin-top: 18px;
+            font-family: "Noto Serif SC", "Source Han Serif SC", serif;
+            font-size: clamp(36px, 5vw, 58px);
+            line-height: 1.06;
+            max-width: 740px;
+        }
+
+        .hero-panel p {
+            margin-top: 14px;
+            max-width: 640px;
+            color: var(--text-muted);
+            font-size: 16px;
+        }
+
+        .hero-pills {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 22px;
+        }
+
+        .hero-pill {
+            padding: 10px 14px;
+            border-radius: 999px;
+            background: rgba(255, 255, 255, 0.72);
+            color: var(--text-muted);
+            font-size: 13px;
+            font-weight: 600;
+        }
+
+        .panel-head {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+
+        .panel-head h2 {
+            font-size: 20px;
+            font-weight: 700;
+        }
+
+        .panel-head span {
+            color: var(--text-soft);
+            font-size: 13px;
+        }
+
+        .job-categories {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+            gap: 16px;
+        }
+
+        .job-card {
+            padding: 24px;
+            cursor: pointer;
+            transition: transform var(--transition), box-shadow var(--transition), border-color var(--transition), background-color var(--transition);
+        }
+
+        .job-card:hover {
+            transform: translateY(-4px);
+            box-shadow: var(--shadow-md);
+        }
+
+        .job-card.selected {
+            border-color: rgba(216, 111, 69, 0.3);
+            background:
+                linear-gradient(135deg, rgba(216, 111, 69, 0.12), rgba(31, 109, 103, 0.12)),
+                rgba(255, 250, 242, 0.88);
+        }
+
+        .job-icon {
+            width: 52px;
+            height: 52px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 18px;
+            background: linear-gradient(135deg, rgba(216, 111, 69, 0.16), rgba(31, 109, 103, 0.16));
+            font-size: 24px;
+            margin-bottom: 18px;
+        }
+
+        .job-card h3 {
+            font-size: 20px;
+            margin-bottom: 8px;
+        }
+
+        .job-card p {
+            color: var(--text-muted);
+            font-size: 14px;
+            line-height: 1.7;
+        }
+
+        .job-tag {
+            display: inline-flex;
+            align-items: center;
+            margin-top: 16px;
+            padding: 8px 12px;
+            border-radius: 999px;
+            background: rgba(255, 255, 255, 0.72);
+            color: var(--text-soft);
+            font-size: 12px;
+            font-weight: 700;
+            letter-spacing: 0.04em;
+        }
+
+        .side-panel {
+            display: flex;
+            flex-direction: column;
+            gap: 18px;
+            justify-content: space-between;
+        }
+
+        .username-chip {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            width: fit-content;
+            padding: 10px 14px;
+            border-radius: 999px;
+            background: rgba(31, 109, 103, 0.08);
+            color: var(--accent-alt);
+            font-weight: 700;
+        }
+
+        .selection-summary h3 {
+            font-family: "Noto Serif SC", "Source Han Serif SC", serif;
+            font-size: 28px;
+            line-height: 1.2;
+            margin-bottom: 12px;
+        }
+
+        .selection-summary p {
+            color: var(--text-muted);
+            line-height: 1.7;
+        }
+
+        .selection-list {
+            display: grid;
+            gap: 12px;
+        }
+
+        .selection-item {
+            padding: 16px 18px;
+            border-radius: 20px;
+            background: rgba(255, 255, 255, 0.72);
+        }
+
+        .selection-item strong {
+            display: block;
+            margin-bottom: 4px;
+            font-size: 15px;
+        }
+
+        .selection-item span {
+            color: var(--text-muted);
+            font-size: 13px;
+            line-height: 1.65;
+        }
+
+        .selection-footer {
+            padding-top: 8px;
+        }
+
+        .selection-status {
+            margin-bottom: 14px;
+            color: var(--text-soft);
+            font-size: 13px;
+        }
+
+        .selection-status strong {
+            color: var(--accent-deep);
+        }
+
+        .selection-footer .btn-primary {
+            width: 100%;
+        }
+
+        .selection-footer .btn-primary:disabled {
+            opacity: 0.42;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        @media (max-width: 980px) {
+            .selection-shell {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 720px) {
+            .job-categories {
+                grid-template-columns: 1fr;
+            }
+
+            .hero-panel,
+            .category-panel,
+            .side-panel {
+                padding: 22px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="page-container">
+        <nav class="navbar">
+            <a href="home.html" class="navbar-brand">面试单元</a>
+            <ul class="navbar-nav">
+                <li><a href="home.html" class="nav-link">首页</a></li>
+                <li><a href="job_selection.html" class="nav-link active">开始面试</a></li>
+                <li><a href="question_bank.html" class="nav-link">题库</a></li>
+                <li><a href="history.html" class="nav-link">历史记录</a></li>
+                <li><a href="profile.html" class="nav-link">个人中心</a></li>
+                <li><a href="#" class="nav-link" onclick="logout()">退出登录</a></li>
+            </ul>
+        </nav>
+
+        <div class="content">
+            <div class="selection-shell">
+                <div>
+                    <section class="hero-panel">
+                        <div class="eyebrow">Interview Track</div>
+                        <h1>先选岗位，再开始对应方向的面试练习。</h1>
+                        <p>选择不同岗位后，系统会组合该方向更常见的问题，练习时不用自己临时筛题。</p>
+                        <div class="hero-pills">
+                            <span class="hero-pill">岗位定制题目</span>
+                            <span class="hero-pill">多模态表现采集</span>
+                            <span class="hero-pill">结构化评分报告</span>
+                        </div>
+                    </section>
+
+                    <section class="category-panel">
+                        <div class="panel-head">
+                            <h2>选择岗位类别</h2>
+                            <span>选中后即可开始</span>
+                        </div>
+                        <div class="job-categories" id="job-categories"></div>
+                    </section>
+                </div>
+
+                <aside class="side-panel">
+                    <div>
+                        <div class="username-chip" id="username-chip">访客</div>
+                        <div class="selection-summary" style="margin-top:18px;">
+                            <h3>这次面试会围绕你的目标方向来出题。</h3>
+                            <p>建议优先选择你最近正在投递或准备复习的岗位，这样报告会更有参考价值。</p>
+                        </div>
+                    </div>
+
+                    <div class="selection-list">
+                        <div class="selection-item">
+                            <strong>更贴近实战</strong>
+                            <span>同一套界面风格延续到岗位选择页，减少页面切换时的割裂感。</span>
+                        </div>
+                        <div class="selection-item">
+                            <strong>题目更有针对性</strong>
+                            <span>系统会在通用题基础上补一题岗位专项题，便于练到具体方向。</span>
+                        </div>
+                        <div class="selection-item">
+                            <strong>准备更高效</strong>
+                            <span>你也可以先去题库预热，再回来进入正式模拟。</span>
+                        </div>
+                    </div>
+
+                    <div class="selection-footer">
+                        <div class="selection-status" id="selection-status">当前未选择岗位</div>
+                        <button class="btn-primary" id="start-interview-btn" disabled>开始面试</button>
+                    </div>
+                </aside>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/auth.js"></script>
+    <script>
+        let selectedCategory = null;
+
+        const categoryMeta = {
+            '前端开发': { icon: '⌘', hint: '组件、性能、交互、工程化' },
+            '后端开发': { icon: '◫', hint: '接口、数据库、并发、稳定性' },
+            '测试开发': { icon: '◎', hint: '用例、自动化、质量、缺陷定位' },
+            '算法工程师': { icon: '◇', hint: '数据结构、复杂度、建模、优化' },
+            'AI工程师': { icon: '✦', hint: '模型、评估、数据与落地' },
+            '数据开发': { icon: '▤', hint: '数仓、ETL、SQL、数据质量' },
+            '运维 / DevOps': { icon: '⚙', hint: '部署、监控、CI/CD、稳定性' },
+            '网络安全': { icon: '◈', hint: '攻防、漏洞、权限、安全加固' },
+            '架构师': { icon: '▣', hint: '系统设计、扩展性、治理' }
+        };
+
+        window.onload = function () {
+            checkLogin();
+            const username = localStorage.getItem('username') || '访客';
+            document.getElementById('username-chip').textContent = `当前账号 · ${username}`;
+            loadJobCategories();
+        };
+
+        function loadJobCategories() {
+            const categories = Object.keys(categoryMeta);
+            const container = document.getElementById('job-categories');
+
+            categories.forEach((category) => {
+                const meta = categoryMeta[category];
+                const card = document.createElement('div');
+                card.className = 'job-card';
+                card.dataset.category = category;
+                card.innerHTML = `
+                    <div class="job-icon">${meta.icon}</div>
+                    <h3>${category}</h3>
+                    <p>${meta.hint}</p>
+                    <div class="job-tag">点击选择</div>
+                `;
+                card.addEventListener('click', () => selectCategory(category, card));
+                container.appendChild(card);
+            });
+        }
+
+        function selectCategory(category, card) {
+            document.querySelectorAll('.job-card').forEach((element) => element.classList.remove('selected'));
+            card.classList.add('selected');
+            selectedCategory = category;
+            document.getElementById('start-interview-btn').disabled = false;
+            document.getElementById('selection-status').innerHTML = `当前已选择 <strong>${category}</strong>`;
+        }
+
+        document.getElementById('start-interview-btn').addEventListener('click', function () {
+            if (!selectedCategory) return;
+            localStorage.setItem('selected_category', selectedCategory);
+            window.location.href = '/frontend/interview.html';
+        });
+
+        function logout() {
+            localStorage.removeItem('user_id');
+            localStorage.removeItem('username');
+            window.location.href = '/frontend/index.html';
+        }
+    </script>
+</body>
+</html>

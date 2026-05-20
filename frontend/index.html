@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>面试单元 - 登录</title>
+    <link rel="stylesheet" href="/frontend/css/style.css">
+    <style>
+        .login-container {
+            min-height: 100vh;
+            display: grid;
+            grid-template-columns: minmax(320px, 1.08fr) minmax(360px, 0.92fr);
+            gap: 28px;
+            align-items: stretch;
+            width: min(1240px, calc(100% - 40px));
+            margin: 0 auto;
+            padding: 24px 0;
+        }
+
+        .brand-panel,
+        .login-box {
+            position: relative;
+            border-radius: 36px;
+            overflow: hidden;
+        }
+
+        .brand-panel {
+            padding: 56px;
+            min-height: 720px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            background:
+                linear-gradient(140deg, rgba(20, 29, 26, 0.92), rgba(27, 62, 59, 0.88)),
+                radial-gradient(circle at 10% 20%, rgba(216, 111, 69, 0.25), transparent 34%);
+            color: #fff7ef;
+            box-shadow: var(--shadow-lg);
+        }
+
+        .brand-panel::before {
+            content: "";
+            position: absolute;
+            inset: 0;
+            background:
+                radial-gradient(circle at top right, rgba(255, 214, 183, 0.18), transparent 30%),
+                linear-gradient(90deg, rgba(255, 255, 255, 0.06) 1px, transparent 1px),
+                linear-gradient(rgba(255, 255, 255, 0.06) 1px, transparent 1px);
+            background-size: auto, 34px 34px, 34px 34px;
+            opacity: 0.72;
+            pointer-events: none;
+        }
+
+        .brand-top,
+        .brand-bottom {
+            position: relative;
+            z-index: 1;
+        }
+
+        .brand-mark {
+            display: inline-flex;
+            align-items: center;
+            gap: 12px;
+            padding: 10px 18px;
+            border-radius: 999px;
+            background: rgba(255, 255, 255, 0.08);
+            font-size: 14px;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+        }
+
+        .brand-mark::before {
+            content: "";
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: #f7b38e;
+            box-shadow: 16px 0 0 rgba(128, 224, 210, 0.45);
+        }
+
+        .brand-copy h1 {
+            margin-top: 28px;
+            max-width: 560px;
+            font-family: "Noto Serif SC", "Source Han Serif SC", serif;
+            font-size: clamp(44px, 5vw, 76px);
+            line-height: 1.02;
+            letter-spacing: 0.02em;
+        }
+
+        .brand-copy p {
+            margin-top: 20px;
+            max-width: 520px;
+            color: rgba(255, 247, 239, 0.78);
+            font-size: 17px;
+        }
+
+        .feature-list {
+            display: grid;
+            gap: 16px;
+            margin-top: 36px;
+        }
+
+        .feature-item {
+            padding: 18px 20px;
+            border-radius: 20px;
+            background: rgba(255, 255, 255, 0.08);
+            backdrop-filter: blur(8px);
+        }
+
+        .feature-item strong {
+            display: block;
+            margin-bottom: 6px;
+            font-size: 16px;
+        }
+
+        .feature-item span {
+            color: rgba(255, 247, 239, 0.74);
+            font-size: 14px;
+        }
+
+        .brand-metrics {
+            display: grid;
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            gap: 14px;
+        }
+
+        .metric {
+            padding: 20px;
+            border-radius: 22px;
+            background: rgba(255, 255, 255, 0.08);
+            backdrop-filter: blur(8px);
+        }
+
+        .metric-value {
+            display: block;
+            font-size: 32px;
+            font-weight: 700;
+            margin-bottom: 4px;
+        }
+
+        .metric-label {
+            color: rgba(255, 247, 239, 0.72);
+            font-size: 13px;
+        }
+
+        .login-box {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 24px;
+        }
+
+        .login-shell {
+            width: min(100%, 500px);
+            padding: 40px;
+            border-radius: 32px;
+            background: rgba(255, 250, 242, 0.86);
+            backdrop-filter: blur(22px);
+            border: 1px solid rgba(255, 255, 255, 0.72);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .login-header {
+            margin-bottom: 28px;
+        }
+
+        .login-kicker {
+            display: inline-flex;
+            padding: 8px 12px;
+            border-radius: 999px;
+            background: var(--accent-soft);
+            color: var(--accent-deep);
+            font-size: 12px;
+            font-weight: 700;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+        }
+
+        .login-header h1 {
+            margin-top: 18px;
+            font-family: "Noto Serif SC", "Source Han Serif SC", serif;
+            font-size: 42px;
+            line-height: 1.08;
+        }
+
+        .login-header p {
+            margin-top: 12px;
+            color: var(--text-muted);
+        }
+
+        .field-note {
+            margin-top: 10px;
+            color: var(--text-soft);
+            font-size: 13px;
+        }
+
+        .form-switch {
+            margin-top: 18px;
+            color: var(--text-muted);
+            font-size: 14px;
+        }
+
+        .form-switch a {
+            color: var(--accent-deep);
+            font-weight: 700;
+            text-decoration: none;
+        }
+
+        .assist-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 12px;
+            margin-top: 18px;
+            color: var(--text-soft);
+            font-size: 13px;
+        }
+
+        @media (max-width: 980px) {
+            .login-container {
+                grid-template-columns: 1fr;
+            }
+
+            .brand-panel {
+                min-height: auto;
+                padding: 36px 28px;
+            }
+
+            .brand-metrics {
+                grid-template-columns: 1fr;
+            }
+
+            .login-shell {
+                padding: 28px 22px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="login-container">
+        <section class="brand-panel fade-in">
+            <div class="brand-top">
+                <div class="brand-mark">Interview Studio</div>
+                <div class="brand-copy">
+                    <h1>把面试训练做成一场有反馈的真实演练。</h1>
+                    <p>从岗位选择、模拟问答到结果复盘，按一次完整练习的顺序走完，方便你发现回答里的问题。</p>
+                </div>
+                <div class="feature-list">
+                    <div class="feature-item">
+                        <strong>按岗位练习</strong>
+                        <span>题目会结合岗位方向，回答时也能顺手练到表达节奏和结构。</span>
+                    </div>
+                    <div class="feature-item">
+                        <strong>更容易发现短板</strong>
+                        <span>分数、历史记录和过程反馈会帮你看见真正需要补的地方。</span>
+                    </div>
+                    <div class="feature-item">
+                        <strong>记录清楚</strong>
+                        <span>练过哪些题、得分如何、哪里需要补，都能回头查看。</span>
+                    </div>
+                </div>
+            </div>
+            <div class="brand-bottom">
+                <div class="brand-metrics">
+                    <div class="metric">
+                        <span class="metric-value">登录</span>
+                        <span class="metric-label">进入个人训练记录</span>
+                    </div>
+                    <div class="metric">
+                        <span class="metric-value">练习</span>
+                        <span class="metric-label">选择岗位开始模拟面试</span>
+                    </div>
+                    <div class="metric">
+                        <span class="metric-value">复盘</span>
+                        <span class="metric-label">查看得分和改进建议</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="login-box fade-in">
+            <div class="login-shell">
+                <div class="login-header">
+                    <span class="login-kicker">Welcome Back</span>
+                    <h1>进入面试单元</h1>
+                    <p>登录后继续你的训练记录，或者创建一个新账号立即开始。</p>
+                </div>
+
+                <div id="login-form" class="form-panel">
+                    <form id="loginForm">
+                        <div class="form-group">
+                            <label for="login-username">用户名</label>
+                            <input type="text" id="login-username" name="username" placeholder="输入你的用户名" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="login-password">密码</label>
+                            <input type="password" id="login-password" name="password" placeholder="输入密码" required>
+                            <div class="field-note">建议使用你注册时填写的账号信息。</div>
+                        </div>
+                        <button type="submit" class="btn-primary">立即登录</button>
+                        <div class="assist-row">
+                            <span>准备继续今天的练习</span>
+                            <span>安全连接</span>
+                        </div>
+                        <p class="form-switch">还没有账号？<a href="javascript:void(0)" onclick="switchForm('register'); return false;">创建账号</a></p>
+                    </form>
+                    <div id="login-message"></div>
+                </div>
+
+                <div id="register-form" class="form-panel hidden">
+                    <form id="registerForm">
+                        <div class="form-group">
+                            <label for="register-username">用户名</label>
+                            <input type="text" id="register-username" name="username" placeholder="设置一个用户名" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="register-password">密码</label>
+                            <input type="password" id="register-password" name="password" placeholder="设置登录密码" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="register-email">邮箱</label>
+                            <input type="email" id="register-email" name="email" placeholder="填写常用邮箱" required>
+                            <div class="field-note">注册成功后可立即返回登录。</div>
+                        </div>
+                        <button type="submit" class="btn-primary">创建账号</button>
+                        <p class="form-switch">已经有账号？<a href="javascript:void(0)" onclick="switchForm('login'); return false;">返回登录</a></p>
+                    </form>
+                    <div id="register-message"></div>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <script src="/frontend/js/auth.js?v=3"></script>
+</body>
+</html>

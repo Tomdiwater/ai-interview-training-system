@@ -1,0 +1,2581 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>面试单元 - AI 面试</title>
+    <link rel="stylesheet" href="css/style.css">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: "Avenir Next", "PingFang SC", "Microsoft YaHei", sans-serif;
+            color: #18201d;
+            background:
+                radial-gradient(circle at top left, rgba(216, 111, 69, 0.16), transparent 28%),
+                radial-gradient(circle at 85% 10%, rgba(31, 109, 103, 0.16), transparent 24%),
+                linear-gradient(180deg, #f8f4ed 0%, #efe6d8 100%);
+        }
+
+        .interview-layout {
+            min-height: 100vh;
+            display: grid;
+            grid-template-columns: minmax(0, 1.12fr) minmax(360px, 0.88fr);
+            gap: 24px;
+            padding: 20px;
+        }
+
+        .left-panel,
+        .right-panel {
+            border-radius: 32px;
+            overflow: hidden;
+            border: 1px solid rgba(255, 255, 255, 0.65);
+            box-shadow: 0 24px 60px rgba(31, 37, 35, 0.12);
+        }
+
+        .left-panel {
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            color: #fff8f2;
+            background:
+                radial-gradient(circle at 16% 18%, rgba(244, 182, 138, 0.24), transparent 24%),
+                radial-gradient(circle at top right, rgba(113, 198, 190, 0.18), transparent 28%),
+                linear-gradient(145deg, #18201d 0%, #1f4945 52%, #af4f28 120%);
+        }
+
+        .left-panel::before {
+            content: "";
+            position: absolute;
+            inset: 0;
+            background:
+                linear-gradient(90deg, rgba(255, 255, 255, 0.06) 1px, transparent 1px),
+                linear-gradient(rgba(255, 255, 255, 0.06) 1px, transparent 1px);
+            background-size: 34px 34px;
+            opacity: 0.28;
+            pointer-events: none;
+        }
+
+        .right-panel {
+            display: flex;
+            flex-direction: column;
+            overflow-y: auto;
+            background: rgba(255, 250, 242, 0.84);
+            backdrop-filter: blur(18px);
+        }
+
+        .header-bar {
+            position: relative;
+            z-index: 1;
+            padding: 22px 26px 12px;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            gap: 16px;
+        }
+
+        .header-bar h2 {
+            font-family: "Noto Serif SC", "Source Han Serif SC", serif;
+            font-size: 30px;
+            line-height: 1.1;
+            margin-bottom: 6px;
+        }
+
+        .header-info {
+            color: rgba(255, 248, 242, 0.74);
+            font-size: 14px;
+        }
+
+        .header-timer {
+            min-width: 104px;
+            padding: 10px 16px;
+            border-radius: 999px;
+            background: rgba(255, 255, 255, 0.12);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            text-align: center;
+            font-size: 18px;
+            font-weight: 800;
+            letter-spacing: 0.04em;
+        }
+
+        .studio-kicker {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            width: fit-content;
+            padding: 8px 14px;
+            border-radius: 999px;
+            background: rgba(255, 255, 255, 0.1);
+            font-size: 12px;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+        }
+
+        .video-area {
+            position: relative;
+            z-index: 1;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            padding: 14px 26px 28px;
+            gap: 20px;
+        }
+
+        .video-wrapper {
+            position: relative;
+            width: 100%;
+            max-width: 680px;
+            aspect-ratio: 4 / 3;
+            margin: 0 auto;
+            border-radius: 30px;
+            overflow: hidden;
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            box-shadow: 0 24px 70px rgba(0, 0, 0, 0.28);
+        }
+
+        .video-wrapper video {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transform: scaleX(-1);
+        }
+
+        .video-overlay {
+            position: absolute;
+            inset: 0;
+            pointer-events: none;
+            border: 3px solid transparent;
+            border-radius: 30px;
+            transition: all 0.3s;
+        }
+
+        .video-overlay.compliant { border-color: #6dd3a8; box-shadow: inset 0 0 0 1px rgba(109, 211, 168, 0.4), 0 0 28px rgba(109, 211, 168, 0.32); }
+        .video-overlay.warning { border-color: #f6b15a; box-shadow: inset 0 0 0 1px rgba(246, 177, 90, 0.4), 0 0 28px rgba(246, 177, 90, 0.28); }
+        .video-overlay.error { border-color: #e86f5d; box-shadow: inset 0 0 0 1px rgba(232, 111, 93, 0.4), 0 0 28px rgba(232, 111, 93, 0.3); }
+
+        .recording-indicator,
+        .emotion-display {
+            backdrop-filter: blur(14px);
+            background: rgba(20, 25, 24, 0.56);
+            border: 1px solid rgba(255, 255, 255, 0.12);
+        }
+
+        .emotion-display {
+            position: absolute;
+            left: 50%;
+            bottom: 16px;
+            transform: translateX(-50%);
+            min-width: 180px;
+            padding: 10px 18px;
+            border-radius: 20px;
+            text-align: center;
+        }
+
+        .emotion-label { font-size: 11px; opacity: 0.68; margin-bottom: 3px; }
+        .emotion-value { font-size: 17px; font-weight: 700; }
+
+        .recording-indicator {
+            position: absolute;
+            top: 16px;
+            right: 16px;
+            padding: 10px 16px;
+            border-radius: 999px;
+            font-size: 13px;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .recording-dot {
+            width: 10px;
+            height: 10px;
+            background: #fff8f2;
+            border-radius: 50%;
+            animation: rec-blink 1s infinite;
+        }
+
+        @keyframes rec-blink { 0%, 100% { opacity: 1; } 50% { opacity: 0.22; } }
+
+        .camera-hints {
+            display: grid;
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            gap: 12px;
+            max-width: 680px;
+            margin: 0 auto;
+        }
+
+        .camera-hint {
+            padding: 14px 16px;
+            border-radius: 20px;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+        }
+
+        .camera-hint strong {
+            display: block;
+            margin-bottom: 4px;
+            font-size: 14px;
+        }
+
+        .camera-hint span {
+            color: rgba(255, 248, 242, 0.72);
+            font-size: 12px;
+            line-height: 1.5;
+        }
+
+        .question-section {
+            padding: 28px 28px 18px;
+            border-bottom: 1px solid rgba(24, 32, 29, 0.08);
+        }
+
+        .question-progress {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            margin-bottom: 18px;
+        }
+
+        .progress-dots {
+            display: flex;
+            gap: 8px;
+            flex: 1;
+        }
+
+        .progress-dot {
+            height: 8px;
+            flex: 1;
+            border-radius: 999px;
+            background: rgba(24, 32, 29, 0.09);
+            transition: all 0.3s;
+        }
+
+        .progress-dot.active { background: linear-gradient(90deg, #d86f45, #1f6d67); }
+        .progress-dot.done { background: #6dd3a8; }
+
+        .question-num {
+            font-size: 14px;
+            font-weight: 800;
+            color: #af4f28;
+            white-space: nowrap;
+        }
+
+        .question-card {
+            padding: 24px;
+            border-radius: 24px;
+            background: rgba(255, 255, 255, 0.72);
+            border: 1px solid rgba(24, 32, 29, 0.08);
+        }
+
+        .question-text {
+            font-family: "Noto Serif SC", "Source Han Serif SC", serif;
+            font-size: 26px;
+            line-height: 1.45;
+            color: #18201d;
+        }
+
+        .answer-section {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            padding: 22px 28px;
+        }
+
+        .answer-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 14px;
+            gap: 16px;
+        }
+
+        .answer-title {
+            font-size: 15px;
+            font-weight: 800;
+            letter-spacing: 0.05em;
+            text-transform: uppercase;
+            color: #5d665f;
+        }
+
+        .mic-btn {
+            width: 58px;
+            height: 58px;
+            border-radius: 50%;
+            border: none;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 22px;
+            transition: all 0.3s;
+            position: relative;
+        }
+
+        .mic-btn.idle { background: linear-gradient(135deg, #d86f45, #1f6d67); color: #fff8f2; box-shadow: 0 14px 28px rgba(175, 79, 40, 0.24); }
+        .mic-btn.recording { background: linear-gradient(135deg, #db5f58, #b33e39); color: #fff8f2; animation: mic-pulse 1.5s infinite; }
+        .mic-btn.paused { background: #f2a64d; color: #fff8f2; }
+
+        @keyframes mic-pulse {
+            0% { box-shadow: 0 0 0 0 rgba(219, 95, 88, 0.46); }
+            70% { box-shadow: 0 0 0 18px rgba(219, 95, 88, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(219, 95, 88, 0); }
+        }
+
+        .transcript-box {
+            flex: 1;
+            min-height: 200px;
+            width: 100%;
+            padding: 18px 20px;
+            resize: none;
+            outline: none;
+            border-radius: 22px;
+            border: 1px solid rgba(24, 32, 29, 0.08);
+            background: rgba(255, 255, 255, 0.68);
+            font-size: 16px;
+            line-height: 1.8;
+            color: #18201d;
+        }
+
+        .transcript-box:focus {
+            border-color: rgba(216, 111, 69, 0.38);
+            background: #fffdf8;
+            box-shadow: 0 0 0 5px rgba(216, 111, 69, 0.1);
+        }
+
+        .metrics-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 12px;
+            padding: 0 28px 20px;
+        }
+
+        .metric-card {
+            padding: 18px;
+            border-radius: 20px;
+            background: rgba(255, 255, 255, 0.72);
+            border: 1px solid rgba(24, 32, 29, 0.08);
+        }
+
+        .metric-label {
+            color: #7d877f;
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            margin-bottom: 8px;
+        }
+
+        .metric-value { font-size: 28px; font-weight: 800; color: #1f6d67; }
+        .metric-value.good { color: #2f8f5b; }
+        .metric-value.warn { color: #d88c30; }
+        .metric-value.bad { color: #cb4b4b; }
+
+        .action-bar {
+            display: flex;
+            gap: 12px;
+            padding: 0 28px 28px;
+        }
+
+        .action-btn {
+            flex: 1;
+            min-height: 54px;
+            border: none;
+            border-radius: 999px;
+            font-size: 15px;
+            font-weight: 800;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .action-btn.prev {
+            background: rgba(24, 32, 29, 0.06);
+            color: #18201d;
+        }
+
+        .action-btn.next {
+            background: linear-gradient(135deg, #d86f45, #1f6d67);
+            color: #fff8f2;
+            box-shadow: 0 16px 34px rgba(175, 79, 40, 0.22);
+        }
+
+        .action-btn.submit {
+            background: linear-gradient(135deg, #2f8f5b, #1f6d67);
+            color: #fff8f2;
+            box-shadow: 0 16px 34px rgba(31, 109, 103, 0.22);
+        }
+
+        .action-btn:disabled { opacity: 0.42; cursor: not-allowed; box-shadow: none; }
+
+        .permission-screen {
+            position: absolute;
+            inset: 0;
+            z-index: 10;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            padding: 56px;
+            text-align: left;
+            color: #fff8f2;
+            background: transparent;
+        }
+
+        .permission-icon {
+            width: 82px;
+            height: 82px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 24px;
+            background: rgba(255, 255, 255, 0.1);
+            font-size: 34px;
+            margin-bottom: 24px;
+        }
+
+        .permission-screen h2 {
+            font-family: "Noto Serif SC", "Source Han Serif SC", serif;
+            font-size: clamp(38px, 4vw, 58px);
+            line-height: 1.05;
+            margin-bottom: 16px;
+            max-width: 520px;
+        }
+
+        .permission-screen p {
+            max-width: 560px;
+            font-size: 16px;
+            line-height: 1.8;
+            color: rgba(255, 248, 242, 0.8);
+            margin-bottom: 18px;
+        }
+
+        .start-btn {
+            width: fit-content;
+            min-height: 58px;
+            padding: 0 30px;
+            border: none;
+            border-radius: 999px;
+            background: #fff7ef;
+            color: #18201d;
+            font-size: 16px;
+            font-weight: 800;
+            cursor: pointer;
+            transition: all 0.3s;
+            box-shadow: 0 16px 34px rgba(0, 0, 0, 0.18);
+        }
+
+        .start-btn:hover { transform: translateY(-2px); }
+
+        .prep-panel {
+            padding: 34px 30px;
+        }
+
+        .prep-panel h3 {
+            font-family: "Noto Serif SC", "Source Han Serif SC", serif;
+            font-size: 34px;
+            line-height: 1.15;
+            margin-bottom: 12px;
+        }
+
+        .prep-panel > p {
+            color: #5d665f;
+            margin-bottom: 24px;
+            line-height: 1.7;
+        }
+
+        .prep-grid {
+            display: grid;
+            gap: 14px;
+        }
+
+        .prep-item {
+            padding: 18px 18px 18px 20px;
+            border-radius: 22px;
+            background: rgba(255, 255, 255, 0.72);
+            border: 1px solid rgba(24, 32, 29, 0.08);
+        }
+
+        .prep-item strong {
+            display: block;
+            margin-bottom: 6px;
+            font-size: 15px;
+        }
+
+        .prep-item span {
+            color: #5d665f;
+            font-size: 14px;
+            line-height: 1.65;
+        }
+
+        .prep-score {
+            margin-top: 18px;
+            padding: 20px;
+            border-radius: 24px;
+            background: linear-gradient(135deg, rgba(216, 111, 69, 0.12), rgba(31, 109, 103, 0.12));
+            border: 1px solid rgba(24, 32, 29, 0.08);
+        }
+
+        .prep-score h4 {
+            margin-bottom: 10px;
+            font-size: 15px;
+        }
+
+        .prep-score ul {
+            padding-left: 18px;
+            color: #5d665f;
+            line-height: 1.8;
+        }
+
+        .report-container { padding: 34px 20px 48px; max-width: 1040px; margin: 0 auto; }
+        .report-header { text-align: center; margin-bottom: 32px; }
+        .report-header h1 {
+            font-family: "Noto Serif SC", "Source Han Serif SC", serif;
+            font-size: 42px;
+            color: #18201d;
+            margin-bottom: 12px;
+        }
+        .report-grade {
+            display: inline-block;
+            padding: 12px 24px;
+            border-radius: 999px;
+            font-size: 18px;
+            font-weight: 800;
+            color: #fff8f2;
+            margin: 12px 0;
+        }
+        .grade-excellent { background: linear-gradient(135deg, #2f8f5b, #1f6d67); }
+        .grade-good { background: linear-gradient(135deg, #1f6d67, #d86f45); }
+        .grade-pass { background: linear-gradient(135deg, #d88c30, #d86f45); }
+        .grade-improve { background: linear-gradient(135deg, #d86f45, #cb4b4b); }
+        .grade-fail { background: linear-gradient(135deg, #cb4b4b, #8e2f2f); }
+        .score-big { font-size: 72px; font-weight: 900; color: #af4f28; }
+
+        .report-section {
+            background: rgba(255, 250, 242, 0.84);
+            backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.68);
+            border-radius: 28px;
+            padding: 24px;
+            margin-bottom: 20px;
+            box-shadow: 0 18px 46px rgba(31, 37, 35, 0.08);
+        }
+
+        .report-section h3 {
+            font-size: 18px;
+            color: #18201d;
+            margin-bottom: 18px;
+            padding-bottom: 12px;
+            border-bottom: 1px solid rgba(24, 32, 29, 0.08);
+        }
+
+        .dim-score-row { display: flex; align-items: center; margin-bottom: 14px; gap: 12px; }
+        .dim-name { width: 180px; font-weight: 700; font-size: 14px; color: #5d665f; }
+        .dim-bar { flex: 1; height: 28px; background: rgba(24, 32, 29, 0.08); border-radius: 999px; overflow: hidden; position: relative; }
+        .dim-fill { height: 100%; border-radius: 999px; transition: width 1s ease; display: flex; align-items: center; justify-content: flex-end; padding-right: 12px; }
+        .dim-fill.nv { background: linear-gradient(90deg, #d86f45, #eaa679); }
+        .dim-fill.vb { background: linear-gradient(90deg, #1f6d67, #58a9a0); }
+        .dim-fill.ct { background: linear-gradient(90deg, #8c5c3c, #d88c30); }
+        .dim-score-val { font-size: 14px; font-weight: 800; color: #fff8f2; min-width: 42px; text-align: right; }
+
+        .sub-dims { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-top: 12px; padding-left: 192px; }
+        .sub-dim-item { background: rgba(255, 255, 255, 0.72); padding: 12px; border-radius: 16px; text-align: center; }
+        .sub-dim-item .label { font-size: 11px; color: #7d877f; }
+        .sub-dim-item .val { font-size: 20px; font-weight: 800; color: #1f6d67; margin-top: 4px; }
+
+        .q-detail { border-left: 4px solid #d86f45; padding: 14px 16px; margin-bottom: 14px; background: rgba(255, 255, 255, 0.68); border-radius: 0 18px 18px 0; }
+        .q-detail-q { font-size: 14px; font-weight: 700; color: #18201d; margin-bottom: 8px; }
+        .q-detail-a { font-size: 13px; color: #5d665f; line-height: 1.7; }
+        .q-score-badge { float: right; background: linear-gradient(135deg, #d86f45, #1f6d67); color: #fff8f2; padding: 5px 12px; border-radius: 999px; font-size: 12px; font-weight: 800; }
+
+        .rec-box { background: rgba(47, 143, 91, 0.08); border: 1px solid rgba(47, 143, 91, 0.18); border-radius: 22px; padding: 22px; margin-bottom: 16px; }
+        .rec-decision { font-size: 20px; font-weight: 800; margin-bottom: 10px; }
+        .rec-reason { font-size: 14px; color: #5d665f; margin-bottom: 14px; line-height: 1.7; }
+        .rec-list { list-style: none; }
+        .rec-list li { padding: 6px 0 6px 22px; font-size: 14px; position: relative; color: #18201d; }
+        .rec-list li::before { content: "•"; position: absolute; left: 0; color: #2f8f5b; font-weight: 900; }
+        .rec-list.weak li::before { color: #d88c30; }
+
+        .hidden { display: none !important; }
+
+        @media (max-width: 1100px) {
+            .interview-layout { grid-template-columns: 1fr; }
+            .camera-hints { grid-template-columns: 1fr; }
+        }
+
+        @media (max-width: 720px) {
+            .interview-layout { padding: 12px; gap: 14px; }
+            .header-bar,
+            .video-area,
+            .question-section,
+            .answer-section,
+            .metrics-grid,
+            .action-bar,
+            .prep-panel,
+            .permission-screen { padding-left: 18px; padding-right: 18px; }
+            .header-bar { flex-direction: column; }
+            .question-text { font-size: 22px; }
+            .metrics-grid,
+            .sub-dims { grid-template-columns: 1fr; padding-left: 0; }
+            .action-bar { flex-direction: column; }
+        }
+    </style>
+</head>
+<body>
+
+<div id="app">
+    <div id="interview-view" class="interview-layout hidden">
+        <div class="left-panel">
+            <div class="header-bar">
+                <div>
+                    <div class="studio-kicker">Interview Mode</div>
+                    <h2>模拟面试</h2>
+                    <div class="header-info" id="header-job"></div>
+                </div>
+                <div class="header-timer" id="timer">00:00</div>
+            </div>
+
+            <div class="video-area">
+                <div class="video-wrapper">
+                    <video id="webcam" autoplay muted playsinline></video>
+                    <div class="video-overlay" id="video-overlay"></div>
+
+                    <div class="recording-indicator hidden" id="rec-indicator">
+                        <span class="recording-dot"></span>
+                        <span>录音中</span>
+                    </div>
+                </div>
+
+                <div class="camera-hints">
+                    <div class="camera-hint">
+                        <strong>保持视线稳定</strong>
+                        <span>把镜头当成面试官，回答时尽量直视前方。</span>
+                    </div>
+                    <div class="camera-hint">
+                        <strong>让环境更干净</strong>
+                        <span>避免背光和杂音，结束后会一起纳入表现分析。</span>
+                    </div>
+                    <div class="camera-hint">
+                        <strong>回答先结构后细节</strong>
+                        <span>先给结论，再补过程和案例，回答会更清楚。</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="right-panel">
+            <div class="question-section">
+                <div class="question-progress">
+                    <span class="question-num" id="q-num">问题 1/5</span>
+                    <div class="progress-dots" id="progress-dots"></div>
+                </div>
+                <div class="question-card">
+                    <div class="question-text" id="q-text">加载中...</div>
+                </div>
+            </div>
+
+            <div class="answer-section">
+                <div class="answer-header">
+                    <span class="answer-title">你的回答</span>
+                    <button class="mic-btn idle" id="mic-btn" title="点击开始录音">🎙</button>
+                </div>
+                <textarea class="transcript-box" id="answer-text" placeholder="点击麦克风开始回答，识别后的内容会显示在这里。" readonly></textarea>
+            </div>
+
+            <div class="metrics-grid">
+                <div class="metric-card"><div class="metric-label">表达流畅</div><div class="metric-value" id="m-fluency">--</div></div>
+            </div>
+
+            <div class="action-bar">
+                <button class="action-btn prev" id="btn-prev" disabled>上一题</button>
+                <button class="action-btn next" id="btn-next">下一题</button>
+                <button class="action-btn submit hidden" id="btn-submit">提交评分</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="permission-view" class="interview-layout">
+        <div class="left-panel">
+            <div class="permission-screen">
+                <div class="permission-icon">🎥</div>
+                <h2>开始前，把这次面试准备成一次正式上场。</h2>
+                <p>系统会结合摄像头、语音识别和文本理解，对你的表达状态、回答质量与面试表现做综合分析。现在这页也改成了真正的面试控制台，不再是单调的蓝底说明板。</p>
+                <p style="font-size:14px;opacity:0.76;">建议在安静环境中进行，正对镜头，保持光线均匀，回答时尽量自然连贯。</p>
+                <button class="start-btn" id="btn-start">开始面试</button>
+            </div>
+        </div>
+        <div class="right-panel">
+            <div class="prep-panel">
+                <h3>面试须知</h3>
+                <p>开始前先确认题量、答题方式和评分重点，避免做到一半才发现遗漏。</p>
+                <div class="prep-grid">
+                    <div class="prep-item">
+                        <strong>镜头状态</strong>
+                        <span>保持摄像头正对自己，面部尽量完整出现在画面中央。</span>
+                    </div>
+                    <div class="prep-item">
+                        <strong>环境条件</strong>
+                        <span>保证光线充足，避免背光和嘈杂环境，让识别更稳定。</span>
+                    </div>
+                    <div class="prep-item">
+                        <strong>回答节奏</strong>
+                        <span>先给结论，再补过程和案例，会比想到哪说到哪更有说服力。</span>
+                    </div>
+                    <div class="prep-item">
+                        <strong>过程提醒</strong>
+                        <span>系统会持续采集音视频数据，请尽量不要中途切换页面或离开画面。</span>
+                    </div>
+                </div>
+                <div class="prep-score">
+                    <h4>AI 评分重点</h4>
+                    <ul>
+                        <li>非语言表现：镜头状态、状态稳定度、交流感</li>
+                        <li>语言表达：流畅度、清晰度、逻辑组织能力</li>
+                        <li>作答内容：专业匹配度、深度、完整性</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="report-view" style="display:none;min-height:100vh;">
+        <nav class="navbar" style="position:sticky;top:0;z-index:100;">
+            <a href="home.html" class="navbar-brand">面试单元</a>
+            <ul class="navbar-nav">
+                <li><a href="home.html" class="nav-link">首页</a></li>
+                <li><a href="job_selection.html" class="nav-link">再次面试</a></li>
+                <li><a href="history.html" class="nav-link">历史记录</a></li>
+                <li><a href="#" onclick="logout()" class="nav-link">退出登录</a></li>
+            </ul>
+        </nav>
+        <div class="report-container" id="report-content"></div>
+    </div>
+</div>
+
+<script src="js/auth.js"></script>
+<script>
+const API = 'http://127.0.0.1:5000';
+const BASE_QUESTIONS = [
+    { question: '请做一个 1 分钟左右的自我介绍。', keywords: '自我介绍,经历,优势' },
+    { question: '请分享一段最能代表你能力的项目或实习经历。', keywords: '项目,实习,职责,结果' },
+    { question: '请解释一个你熟悉的数据结构、算法或核心技术概念。', keywords: '原理,场景,优缺点' },
+    { question: '请详细说明你在项目中遇到过的一个难点，以及你是怎么解决的。', keywords: '难点,排查,解决,复盘' },
+    { question: '当面对压力、分歧或时间紧任务时，你通常如何处理？', keywords: '压力,沟通,协作,应对' },
+    { question: '如果现在是正式面试的最后阶段，你会反问面试官什么问题？', keywords: '反问,岗位,团队,成长' }
+];
+
+const EXTRA_QUESTIONS = {
+    '前端开发': [
+        '你会如何做前端性能优化？请说说真实项目中的做法。',
+        '什么是 SPA？它的优缺点分别是什么？'
+    ],
+    '后端开发': [
+        '请说明 RESTful API 设计时你最关注的原则。',
+        '请解释数据库事务与 ACID，并举例说明。'
+    ],
+    '测试开发': [
+        '请说明你会如何设计一个登录接口的测试用例。',
+        '自动化测试适合覆盖哪些场景？'
+    ],
+    '算法工程师': [
+        '请解释动态规划的基本思路。',
+        '你如何评估一个分类模型的效果？'
+    ],
+    'AI工程师': [
+        '请解释监督学习和无监督学习的差异。',
+        '你如何评估一个模型是否真的有效？'
+    ],
+    '数据开发': [
+        '请说明数仓分层通常怎么设计。',
+        'SQL 调优可以从哪些方面入手？'
+    ],
+    '运维 / DevOps': [
+        '请说明一次完整的 CI/CD 流程。',
+        '线上服务 CPU 或内存异常升高时你会如何排查？'
+    ],
+    '网络安全': [
+        '请解释 SQL 注入的原理和防范方式。',
+        'XSS 和 CSRF 有什么区别？'
+    ],
+    '架构师': [
+        '请解释分布式系统里你最关注的核心问题。',
+        '你会如何权衡单体架构和微服务架构？'
+    ]
+};
+
+let questions = [];
+let answers = [];
+let faceSnapshots = [];
+let speechAnalysisList = [];
+let currentIndex = 0;
+let timerInterval = null;
+let seconds = 0;
+let cameraStream = null;
+let faceLoopTimer = null;
+let faceDetectFailCount = 0;
+let lastFaceErrorMessage = '';
+let isRecording = false;
+let audioContext = null;
+let recordingStream = null;
+let sourceNode = null;
+let processorNode = null;
+let pcmChunks = [];
+let liveRecognition = null;
+let liveTranscriptFinal = '';
+let liveTranscriptInterim = '';
+let localFaceDetector = null;
+
+window.onload = function () {
+    checkLogin();
+    const category = localStorage.getItem('selected_category');
+    if (!category) {
+        location.href = 'job_selection.html';
+        return;
+    }
+
+    document.getElementById('header-job').textContent = category;
+    document.getElementById('btn-start').onclick = startInterview;
+    document.getElementById('mic-btn').onclick = toggleMic;
+    document.getElementById('btn-prev').onclick = prevQuestion;
+    document.getElementById('btn-next').onclick = nextQuestion;
+    document.getElementById('btn-submit').onclick = submitInterview;
+};
+
+async function startInterview() {
+    try {
+        cameraStream = await navigator.mediaDevices.getUserMedia({
+            video: { width: 640, height: 480 },
+            audio: false
+        });
+        if ('FaceDetector' in window) {
+            try {
+                localFaceDetector = new FaceDetector({ fastMode: true, maxDetectedFaces: 3 });
+            } catch (e) {
+                localFaceDetector = null;
+            }
+        } else {
+            localFaceDetector = null;
+        }
+
+        document.getElementById('webcam').srcObject = cameraStream;
+        buildQuestions();
+        renderProgressDots();
+        showQuestion(0);
+
+        document.getElementById('permission-view').classList.add('hidden');
+        document.getElementById('interview-view').classList.remove('hidden');
+        startTimer();
+        startFaceCaptureLoop();
+    } catch (error) {
+        console.error('startInterview error:', error);
+        alert(`无法启动面试，请检查摄像头权限：${error.message}`);
+    }
+}
+
+function buildQuestions() {
+    const category = localStorage.getItem('selected_category') || '';
+    questions = [...BASE_QUESTIONS];
+
+    const extra = EXTRA_QUESTIONS[category] || [];
+    if (extra.length > 0) {
+        const picked = [...extra].sort(() => Math.random() - 0.5).slice(0, 1);
+        picked.forEach((question) => {
+            questions.splice(3, 0, { question, keywords: '专业问题,场景,原理' });
+        });
+    }
+
+    answers = new Array(questions.length).fill('');
+    faceSnapshots = new Array(questions.length).fill(null);
+    speechAnalysisList = new Array(questions.length).fill(null);
+}
+
+function renderProgressDots() {
+    const container = document.getElementById('progress-dots');
+    container.innerHTML = questions.map((_, index) => `<div class="progress-dot" id="dot-${index}"></div>`).join('');
+}
+
+function showQuestion(index) {
+    currentIndex = index;
+    document.getElementById('q-num').textContent = `问题 ${index + 1}/${questions.length}`;
+    document.getElementById('q-text').textContent = questions[index].question;
+    document.getElementById('answer-text').value = answers[index] || '';
+
+    for (let i = 0; i < questions.length; i += 1) {
+        const dot = document.getElementById(`dot-${i}`);
+        dot.className = `progress-dot${i < index ? ' done' : i === index ? ' active' : ''}`;
+    }
+
+    document.getElementById('btn-prev').disabled = index === 0;
+    document.getElementById('btn-next').classList.toggle('hidden', index === questions.length - 1);
+    document.getElementById('btn-submit').classList.toggle('hidden', index !== questions.length - 1);
+}
+
+function prevQuestion() {
+    if (isRecording) {
+        stopRecording();
+    }
+    if (currentIndex > 0) {
+        showQuestion(currentIndex - 1);
+    }
+}
+
+function nextQuestion() {
+    if (isRecording) {
+        stopRecording();
+    }
+    if (currentIndex < questions.length - 1) {
+        showQuestion(currentIndex + 1);
+    }
+}
+
+function startTimer() {
+    timerInterval = setInterval(() => {
+        seconds += 1;
+        const minutes = String(Math.floor(seconds / 60)).padStart(2, '0');
+        const secs = String(seconds % 60).padStart(2, '0');
+        document.getElementById('timer').textContent = `${minutes}:${secs}`;
+    }, 1000);
+}
+
+function toggleMic() {
+    if (isRecording) {
+        stopRecording();
+    } else {
+        startRecording();
+    }
+}
+
+async function startRecording() {
+    try {
+        recordingStream = await navigator.mediaDevices.getUserMedia({
+            audio: {
+                channelCount: 1,
+                sampleRate: 16000,
+                echoCancellation: true,
+                noiseSuppression: true
+            },
+            video: false
+        });
+
+        audioContext = new (window.AudioContext || window.webkitAudioContext)({ sampleRate: 16000 });
+        sourceNode = audioContext.createMediaStreamSource(recordingStream);
+        processorNode = audioContext.createScriptProcessor(4096, 1, 1);
+        pcmChunks = [];
+
+        processorNode.onaudioprocess = (event) => {
+            const inputData = event.inputBuffer.getChannelData(0);
+            pcmChunks.push(new Float32Array(inputData));
+        };
+
+        sourceNode.connect(processorNode);
+        processorNode.connect(audioContext.destination);
+
+        isRecording = true;
+        document.getElementById('mic-btn').className = 'mic-btn recording';
+        document.getElementById('rec-indicator').classList.remove('hidden');
+        document.getElementById('answer-text').value = '';
+        startLiveTranscript();
+        document.getElementById('answer-text').placeholder = '正在录音，结束后会自动送到科大讯飞识别。';
+    } catch (error) {
+        console.error('startRecording error:', error);
+        alert(`无法开始录音，请检查麦克风权限：${error.message}`);
+        cleanupRecording();
+    }
+}
+
+async function stopRecording() {
+    if (!isRecording) {
+        return;
+    }
+
+    isRecording = false;
+    const liveDraft = stopLiveTranscript();
+    document.getElementById('mic-btn').className = 'mic-btn idle';
+    document.getElementById('rec-indicator').classList.add('hidden');
+    if (liveDraft) {
+        document.getElementById('answer-text').value = `${liveDraft}\n\n(实时识别草稿，正在用讯飞结果校准...)`;
+    }
+    document.getElementById('answer-text').placeholder = '正在识别，请稍候...';
+
+    const pcmBase64 = encodePcmChunksToBase64(pcmChunks);
+    cleanupRecording();
+
+    if (!pcmBase64) {
+        alert('录音内容为空，请重新回答。');
+        return;
+    }
+
+    await sendAudioToBackend(pcmBase64, liveDraft);
+}
+
+function cleanupRecording() {
+    if (processorNode) {
+        processorNode.disconnect();
+        processorNode.onaudioprocess = null;
+        processorNode = null;
+    }
+
+    if (sourceNode) {
+        sourceNode.disconnect();
+        sourceNode = null;
+    }
+
+    if (audioContext) {
+        audioContext.close();
+        audioContext = null;
+    }
+
+    if (recordingStream) {
+        recordingStream.getTracks().forEach((track) => track.stop());
+        recordingStream = null;
+    }
+}
+
+function startLiveTranscript() {
+    const Recognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+    if (!Recognition) return;
+
+    liveTranscriptFinal = '';
+    liveTranscriptInterim = '';
+    liveRecognition = new Recognition();
+    liveRecognition.lang = 'zh-CN';
+    liveRecognition.continuous = true;
+    liveRecognition.interimResults = true;
+
+    liveRecognition.onresult = (event) => {
+        let finalText = '';
+        let interimText = '';
+        for (let i = event.resultIndex; i < event.results.length; i += 1) {
+            const chunk = event.results[i][0]?.transcript || '';
+            if (event.results[i].isFinal) finalText += chunk;
+            else interimText += chunk;
+        }
+        if (finalText) liveTranscriptFinal = `${liveTranscriptFinal}${finalText}`.trim();
+        liveTranscriptInterim = interimText.trim();
+
+        if (isRecording) {
+            const merged = `${liveTranscriptFinal} ${liveTranscriptInterim}`.trim();
+            if (merged) document.getElementById('answer-text').value = merged;
+        }
+    };
+
+    liveRecognition.onerror = (event) => {
+        console.warn('live recognition error:', event.error);
+    };
+
+    liveRecognition.onend = () => {
+        if (isRecording && liveRecognition) {
+            try { liveRecognition.start(); } catch (e) { console.warn('live recognition restart failed:', e); }
+        }
+    };
+
+    try { liveRecognition.start(); } catch (e) { console.warn('live recognition start failed:', e); }
+}
+
+function stopLiveTranscript() {
+    const merged = `${liveTranscriptFinal} ${liveTranscriptInterim}`.trim();
+    if (liveRecognition) {
+        liveRecognition.onend = null;
+        try { liveRecognition.stop(); } catch (e) { console.warn('live recognition stop failed:', e); }
+        liveRecognition = null;
+    }
+    liveTranscriptFinal = '';
+    liveTranscriptInterim = '';
+    return merged;
+}
+
+function encodePcmChunksToBase64(chunks) {
+    if (!chunks.length) {
+        return '';
+    }
+
+    let length = 0;
+    chunks.forEach((chunk) => { length += chunk.length; });
+    const merged = new Float32Array(length);
+    let offset = 0;
+
+    chunks.forEach((chunk) => {
+        merged.set(chunk, offset);
+        offset += chunk.length;
+    });
+
+    const pcm = new Int16Array(merged.length);
+    for (let i = 0; i < merged.length; i += 1) {
+        const sample = Math.max(-1, Math.min(1, merged[i]));
+        pcm[i] = sample < 0 ? sample * 0x8000 : sample * 0x7fff;
+    }
+
+    const bytes = new Uint8Array(pcm.buffer);
+    let binary = '';
+    const chunkSize = 0x8000;
+    for (let i = 0; i < bytes.length; i += chunkSize) {
+        binary += String.fromCharCode(...bytes.subarray(i, i + chunkSize));
+    }
+    return btoa(binary);
+}
+
+function countFillerWordsInText(text) {
+    if (!text) return 0;
+    const matches = text.match(/(嗯|啊|呃|那个|这个|然后|就是|我想想|想一想)/g);
+    return matches ? matches.length : 0;
+}
+
+function estimateStrictFluency(text) {
+    const t = (text || '').trim();
+    if (!t) return 0;
+    const wordCount = t.replace(/\s+/g, '').length;
+    const filler = countFillerWordsInText(t);
+    const repeatPenalty = /(.)\1{2,}/.test(t) ? 12 : 0;
+    const shortPenalty = Math.max(0, 22 - wordCount) * 2.4;
+    let score = 78 - filler * 10 - repeatPenalty - shortPenalty;
+    if (wordCount < 8) score -= 15;
+    return Math.max(0, Math.min(100, Math.round(score)));
+}
+
+async function sendAudioToBackend(base64Audio, liveDraft = '') {
+    try {
+        document.getElementById('answer-text').value = '正在调用科大讯飞 ASR 识别...';
+
+        const response = await fetch(`${API}/api/interview/asr`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ audio: base64Audio })
+        });
+
+        const result = await response.json();
+        if (!response.ok || !result.success || !result.text) {
+            const detail = result.details ? ` | 详情: ${result.details}` : '';
+            throw new Error((result.error || '科大讯飞语音识别失败') + detail);
+        }
+
+        answers[currentIndex] = result.text;
+        document.getElementById('answer-text').value = result.text;
+
+        if (result.analysis) {
+            const strictFluency = estimateStrictFluency(result.text);
+            const backendFluency = Number(result.analysis.fluency_score ?? strictFluency);
+            const mergedFluency = Math.min(strictFluency, backendFluency);
+            speechAnalysisList[currentIndex] = {
+                ...result.analysis,
+                filler_words: Math.max(Number(result.analysis.filler_words || 0), countFillerWordsInText(result.text)),
+                word_count: Math.max(Number(result.analysis.word_count || 0), result.text.length),
+                fluency_score: mergedFluency
+            };
+            updateFluencyMetric(mergedFluency);
+        }
+
+        await analyzeRecognizedText(result.text);
+    } catch (error) {
+        console.error('sendAudioToBackend error:', error);
+        if (liveDraft) {
+            answers[currentIndex] = liveDraft;
+            document.getElementById('answer-text').value = liveDraft;
+        } else {
+            document.getElementById('answer-text').value = '';
+        }
+        alert(`语音识别失败：${error.message}`);
+    }
+}
+
+async function analyzeRecognizedText(text) {
+    try {
+        const response = await fetch(`${API}/api/interview/analyze_text`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                text,
+                question: questions[currentIndex].question,
+                job_category: localStorage.getItem('selected_category')
+            })
+        });
+
+        const result = await response.json();
+        if (!response.ok || !result.success) {
+            const detail = result.details ? ` | 详情: ${result.details}` : '';
+            throw new Error((result.error || '文本分析失败') + detail);
+        }
+
+        const existing = speechAnalysisList[currentIndex] || {};
+        const strictFluency = estimateStrictFluency(text);
+        const modelFluency = Number(result.analysis?.fluency_score ?? strictFluency);
+        const mergedFluency = Math.min(strictFluency, modelFluency);
+        speechAnalysisList[currentIndex] = {
+            ...existing,
+            ...result.analysis,
+            filler_words: Math.max(Number(existing.filler_words || 0), Number(result.analysis?.filler_words || 0), countFillerWordsInText(text)),
+            word_count: Math.max(Number(existing.word_count || 0), Number(result.analysis?.word_count || 0), text.length),
+            fluency_score: mergedFluency
+        };
+        updateFluencyMetric(mergedFluency);
+    } catch (error) {
+        console.error('analyzeRecognizedText error:', error);
+        alert(`文本分析失败：${error.message}`);
+    }
+}
+
+function updateFluencyMetric(score) {
+    if (score === undefined || score === null) {
+        return;
+    }
+
+    const element = document.getElementById('m-fluency');
+    const value = Number(score);
+    element.textContent = Math.round(value);
+    element.className = `metric-value ${value >= 80 ? 'good' : value >= 60 ? 'warn' : 'bad'}`;
+}
+
+function buildLocalFaceResult(detectedFaces, frameWidth, frameHeight) {
+    if (!Array.isArray(detectedFaces) || detectedFaces.length === 0) {
+        return {
+            success: true,
+            face_detected: false,
+            compliance_check: {
+                is_compliant: false,
+                face_coverage: 0,
+                is_frontal: false,
+                has_occlusion: false,
+                lighting_ok: true,
+                deductions: ['未检测到人脸']
+            },
+            expression_analysis: {
+                confidence: 35,
+                dominant_emotion: 'neutral',
+                attention: 30,
+                eye_gaze: { direction_x: 0 },
+                head_pose: { yaw: 0, pitch: 0 }
+            }
+        };
+    }
+
+    const biggest = detectedFaces
+        .map((f) => f.boundingBox)
+        .filter(Boolean)
+        .sort((a, b) => (b.width * b.height) - (a.width * a.height))[0];
+
+    if (!biggest) {
+        return buildLocalFaceResult([], frameWidth, frameHeight);
+    }
+
+    const areaPct = (biggest.width * biggest.height) / (frameWidth * frameHeight) * 100;
+    const coverage = Math.max(0, Math.min(100, Math.round(areaPct * 3.5)));
+    const cx = biggest.x + biggest.width / 2;
+    const cy = biggest.y + biggest.height / 2;
+    const centerDx = Math.abs(cx - frameWidth / 2) / frameWidth;
+    const centerDy = Math.abs(cy - frameHeight / 2) / frameHeight;
+    const aspect = biggest.width / Math.max(1, biggest.height);
+    const isFrontal = aspect > 0.55 && aspect < 1.8 && centerDx < 0.28 && centerDy < 0.28;
+    const isCompliant = coverage >= 45 && isFrontal;
+    const attention = Math.max(30, Math.min(95, Math.round(95 - (centerDx + centerDy) * 120)));
+
+    return {
+        success: true,
+        face_detected: true,
+        compliance_check: {
+            is_compliant: isCompliant,
+            face_coverage: coverage,
+            is_frontal: isFrontal,
+            has_occlusion: false,
+            lighting_ok: true,
+            deductions: isCompliant ? [] : ['请将面部完整置于画面中央']
+        },
+        expression_analysis: {
+            confidence: 70,
+            dominant_emotion: 'neutral',
+            attention,
+            eye_gaze: { direction_x: 0 },
+            head_pose: { yaw: 0, pitch: 0 }
+        }
+    };
+}
+
+function startFaceCaptureLoop() {
+    const video = document.getElementById('webcam');
+    const canvas = document.createElement('canvas');
+    canvas.width = 320;
+    canvas.height = 240;
+    const ctx = canvas.getContext('2d');
+
+    faceLoopTimer = setInterval(async () => {
+        if (!video.videoWidth) {
+            return;
+        }
+
+        try {
+            ctx.drawImage(video, 0, 0, 320, 240);
+            const image = canvas.toDataURL('image/jpeg', 0.75);
+            let result = null;
+
+            if (localFaceDetector) {
+                const faces = await localFaceDetector.detect(canvas);
+                result = buildLocalFaceResult(faces, canvas.width, canvas.height);
+            } else {
+                const response = await fetch(`${API}/api/interview/face_detect`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ image })
+                });
+
+                const raw = await response.text();
+                if (raw) {
+                    try {
+                        result = JSON.parse(raw);
+                    } catch (e) {
+                        result = null;
+                    }
+                }
+                if (!response.ok || !result || result.success === false) {
+                    const detail = result && result.details ? ` | 详情: ${result.details}` : '';
+                    throw new Error((result && result.error) || `人脸检测暂不可用(${response.status})${detail}`);
+                }
+            }
+
+            faceDetectFailCount = 0;
+            lastFaceErrorMessage = '';
+            faceSnapshots[currentIndex] = (result && typeof result === 'object') ? result : {};
+            updateFaceUI(result);
+        } catch (error) {
+            faceDetectFailCount += 1;
+            const msg = error?.message || '检测失败';
+
+            // 避免相同错误在控制台无限刷屏
+            if (msg !== lastFaceErrorMessage || faceDetectFailCount <= 2) {
+                console.error('startFaceCaptureLoop error:', error);
+                lastFaceErrorMessage = msg;
+            }
+
+            faceSnapshots[currentIndex] = {};
+            document.getElementById('m-face').textContent = '--';
+            document.getElementById('m-face').className = 'metric-value warn';
+            setFaceStatusWarning(`人脸检测异常：${msg}`);
+        }
+    }, 3000);
+}
+
+function updateFaceUI(data) {
+    const overlay = document.getElementById('video-overlay');
+    const dot = document.getElementById('status-dot');
+    const statusText = document.getElementById('face-status-text');
+    const metric = document.getElementById('m-face');
+
+    const compliance = data.compliance_check || data.compliance || {};
+    const coverage = Number(compliance.face_coverage || data.face_coverage || 0);
+    const ok = compliance.is_compliant !== false && coverage >= 60;
+
+    overlay.className = `video-overlay ${ok ? 'compliant' : 'warning'}`;
+    dot.className = `status-dot ${ok ? 'green' : 'yellow'}`;
+    statusText.textContent = ok ? '状态正常' : '请调整镜头';
+    metric.textContent = `${Math.round(coverage)}%`;
+    metric.className = `metric-value ${coverage >= 80 ? 'good' : coverage >= 60 ? 'warn' : 'bad'}`;
+}
+
+function setFaceStatusWarning(message) {
+    const overlay = document.getElementById('video-overlay');
+    const dot = document.getElementById('status-dot');
+    const statusText = document.getElementById('face-status-text');
+    overlay.className = 'video-overlay warning';
+    dot.className = 'status-dot yellow';
+    statusText.textContent = message || '检测失败';
+}
+
+async function submitInterview() {
+    if (isRecording) {
+        await stopRecording();
+    }
+
+    clearInterval(timerInterval);
+    clearInterval(faceLoopTimer);
+
+    if (cameraStream) {
+        cameraStream.getTracks().forEach((track) => track.stop());
+        cameraStream = null;
+    }
+
+    document.getElementById('interview-view').classList.add('hidden');
+    document.body.insertAdjacentHTML(
+        'beforeend',
+        '<div id="submitting-overlay" style="position:fixed;inset:0;background:rgba(24,32,29,0.72);display:flex;align-items:center;justify-content:center;z-index:9999;color:#fff8f2;font-size:20px;"><div>正在生成面试报告，请稍候...</div></div>'
+    );
+
+    try {
+        const normalizedSpeechList = speechAnalysisList.map((item, index) => {
+            const answerText = answers[index] || '';
+            const strictFluency = estimateStrictFluency(answerText);
+            const merged = item && typeof item === 'object' ? { ...item } : {};
+            merged.filler_words = Math.max(Number(merged.filler_words || 0), countFillerWordsInText(answerText));
+            merged.word_count = Math.max(Number(merged.word_count || 0), answerText.length);
+            merged.fluency_score = Math.min(Number(merged.fluency_score ?? strictFluency), strictFluency);
+            return { analysis: merged };
+        });
+
+        const response = await fetch(`${API}/api/interview/multimodal_score`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                user_id: parseInt(localStorage.getItem('user_id'), 10),
+                job_category: localStorage.getItem('selected_category'),
+                questions,
+                answers,
+                face_snapshots: faceSnapshots.map((item) => (item && typeof item === 'object') ? item : {}),
+                speech_analysis_list: normalizedSpeechList
+            })
+        });
+
+        const data = await response.json();
+        if (!response.ok || !data.report) {
+            const detail = data.details ? ` | 详情: ${data.details}` : '';
+            throw new Error((data.error || '提交评分失败') + detail);
+        }
+
+        showReport(data.report);
+    } catch (error) {
+        console.error('submitInterview error:', error);
+        alert(`提交失败：${error.message}`);
+        location.href = '/frontend/job_selection.html';
+    } finally {
+        document.getElementById('submitting-overlay')?.remove();
+    }
+}
+
+function showReport(report) {
+    document.getElementById('permission-view').classList.add('hidden');
+    document.getElementById('interview-view').classList.add('hidden');
+    document.getElementById('report-view').style.display = 'block';
+
+    const overall = report.overall_result || {};
+    const recommendation = report.recommendation || {};
+    const summary = report.multimodal_analysis_summary || {};
+    const details = report.question_details || [];
+    const sections = report.dimension_scores || {};
+
+    const gradeMap = {
+        '优秀': 'excellent',
+        '良好': 'good',
+        '合格': 'pass',
+        '待改进': 'improve',
+        '不合格': 'fail'
+    };
+
+    const html = `
+        <div class="report-header">
+            <h1>AI 面试评分报告</h1>
+            <div class="score-big">${overall.total_score ?? '--'}</div>
+            <div class="report-grade ${gradeMap[overall.grade] || 'pass'}">${overall.grade || '待评估'} · ${overall.grade_description || ''}</div>
+            <div style="color:#7d877f;margin-top:8px;font-size:14px;">${report.basic_info?.scoring_engine || '评分引擎'} | ${report.basic_info?.interview_date || ''}</div>
+        </div>
+
+        <div class="report-section">
+            <h3>维度概览</h3>
+            ${Object.entries(sections).map(([label, section], index) => renderDimRow(label, section, ['nv', 'vb', 'ct'][index] || 'nv')).join('')}
+        </div>
+
+        <div class="report-section">
+            <h3>逐题表现</h3>
+            ${details.map((item) => `
+                <div class="q-detail">
+                    <span class="q-score-badge">${item.得分 || '--'} 分</span>
+                    <div class="q-detail-q">Q${item.序号 || ''}：${item.问题 || ''}</div>
+                    <div class="q-detail-a">回答：${item.作答 || '未作答'}</div>
+                </div>
+            `).join('')}
+        </div>
+
+        <div class="report-section">
+            <h3>多模态摘要</h3>
+            <div style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;">
+                ${Object.entries(summary).map(([key, value]) => `
+                    <div style="padding:14px;background:rgba(255,255,255,0.72);border-radius:18px;text-align:center;">
+                        <div style="font-size:12px;color:#7d877f;">${key}</div>
+                        <div style="font-size:18px;font-weight:800;color:#1f6d67;margin-top:4px;">${value}</div>
+                    </div>
+                `).join('')}
+            </div>
+        </div>
+
+        <div class="report-section">
+            <h3>录用建议</h3>
+            <div class="rec-box">
+                <div class="rec-decision">建议：${recommendation.decision || '待定'}</div>
+                <div class="rec-reason">${recommendation.reason || '暂无详细说明。'}</div>
+                <strong style="display:block;margin:12px 0 6px;">优势亮点</strong>
+                <ul class="rec-list">${(recommendation.strengths || []).map((item) => `<li>${item}</li>`).join('')}</ul>
+                <strong style="display:block;margin:12px 0 6px;">待改进点</strong>
+                <ul class="rec-list weak">${(recommendation.weaknesses || []).map((item) => `<li>${item}</li>`).join('')}</ul>
+                <strong style="display:block;margin:12px 0 6px;">具体建议</strong>
+                <ul class="rec-list">${(recommendation.suggestions || []).map((item) => `<li>${item}</li>`).join('')}</ul>
+            </div>
+        </div>
+
+        <div style="text-align:center;padding:24px 0;">
+            <button class="action-btn next" onclick="location.href='/frontend/job_selection.html'" style="width:200px;">再来一次</button>
+            <button class="action-btn prev" onclick="location.href='/frontend/home.html'" style="width:200px;">返回首页</button>
+        </div>
+    `;
+
+    document.getElementById('report-content').innerHTML = html;
+}
+
+function renderDimRow(label, data, type) {
+    const score = Number(data?.score || data?.subtotal || 0);
+    const sub = data?.sub_dimensions || data?.breakdown || {};
+    return `
+        <div style="margin-bottom:18px;">
+            <div class="dim-score-row">
+                <div class="dim-name">${label}</div>
+                <div class="dim-bar">
+                    <div class="dim-fill ${type}" style="width:${score}%"><span class="dim-score-val">${Math.round(score)}</span></div>
+                </div>
+                <div style="font-size:15px;font-weight:700;color:#333;">${Math.round(score)}</div>
+            </div>
+            ${Object.keys(sub).length ? `<div class="sub-dims">${Object.entries(sub).map(([key, value]) => `<div class="sub-dim-item"><div class="label">${key}</div><div class="val">${Math.round(Number(value) || 0)}</div></div>`).join('')}</div>` : ''}
+        </div>
+    `;
+}
+
+// ---- Runtime overrides for robustness and stricter scoring ----
+function countFillerWordsInText(text) {
+    const t = String(text || '');
+    const fillerPattern = /(嗯|啊|呃|额|那个|这个|然后|就是|我想想|想一想|em+|uh+|um+)/giu;
+    const matches = t.match(fillerPattern);
+    return matches ? matches.length : 0;
+}
+
+function estimateStrictFluency(text) {
+    const t = String(text || '').trim();
+    if (!t) return 0;
+    const compact = t.replace(/\s+/g, '');
+    const length = compact.length;
+    const filler = countFillerWordsInText(compact);
+    const repeatedChars = /(.)\1{2,}/u.test(compact) ? 1 : 0;
+    const repeatedShortPhrase = /(.{1,6})\1{1,}/u.test(compact) ? 1 : 0;
+    const shortPenalty = Math.max(0, 26 - length) * 2.3;
+    const fillerPenalty = filler * 13;
+    const repeatPenalty = repeatedChars * 16 + repeatedShortPhrase * 12;
+    let score = 78 - shortPenalty - fillerPenalty - repeatPenalty;
+    if (length < 10) score -= 18;
+    return Math.max(0, Math.min(100, Math.round(score)));
+}
+
+function updateFaceUI(data) {
+    const overlay = document.getElementById('video-overlay');
+    const dot = document.getElementById('status-dot');
+    const statusText = document.getElementById('face-status-text');
+    const metric = document.getElementById('m-face');
+
+    const compliance = (data && (data.compliance_check || data.compliance)) || {};
+    let coverage = Number(compliance.face_coverage ?? data?.face_coverage ?? 0);
+    const faceDetected = data?.face_detected !== false && coverage > 0;
+    if (!Number.isFinite(coverage) || !faceDetected) coverage = 0;
+
+    const ok = faceDetected && compliance.is_compliant !== false && coverage >= 60;
+    overlay.className = `video-overlay ${ok ? 'compliant' : 'warning'}`;
+    dot.className = `status-dot ${ok ? 'green' : 'yellow'}`;
+    statusText.textContent = ok ? '状态正常' : (faceDetected ? '请调整镜头' : '未检测到人脸');
+    metric.textContent = `${Math.round(coverage)}%`;
+    metric.className = `metric-value ${coverage >= 80 ? 'good' : coverage >= 60 ? 'warn' : 'bad'}`;
+}
+
+async function sendAudioToBackend(base64Audio, liveDraft = '') {
+    try {
+        document.getElementById('answer-text').value = '正在调用科大讯飞 ASR 识别...';
+        const response = await fetch(`${API}/api/interview/asr`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ audio: base64Audio })
+        });
+
+        const raw = await response.text();
+        let result = {};
+        try {
+            result = raw ? JSON.parse(raw) : {};
+        } catch {
+            throw new Error(`ASR 返回非JSON(${response.status})`);
+        }
+
+        if (!response.ok || !result.success) {
+            const detail = result.details ? ` | 详情: ${result.details}` : '';
+            throw new Error((result.error || '科大讯飞语音识别失败') + detail);
+        }
+
+        const recognizedText = String(result.text || '').trim();
+        if (!recognizedText) {
+            if (liveDraft) {
+                answers[currentIndex] = liveDraft;
+                document.getElementById('answer-text').value = liveDraft;
+                const strictFluency = estimateStrictFluency(liveDraft);
+                speechAnalysisList[currentIndex] = {
+                    ...(speechAnalysisList[currentIndex] || {}),
+                    fluency_score: strictFluency,
+                    filler_words: countFillerWordsInText(liveDraft),
+                    word_count: liveDraft.length
+                };
+                updateFluencyMetric(strictFluency);
+                await analyzeRecognizedText(liveDraft);
+                return;
+            }
+            throw new Error(result.warning || '未识别到有效语音，请重试');
+        }
+
+        answers[currentIndex] = recognizedText;
+        document.getElementById('answer-text').value = recognizedText;
+        const strictFluency = estimateStrictFluency(recognizedText);
+        const backendFluency = Number(result.analysis?.fluency_score ?? strictFluency);
+        const mergedFluency = Math.min(strictFluency, backendFluency);
+        speechAnalysisList[currentIndex] = {
+            ...(result.analysis || {}),
+            fluency_score: mergedFluency,
+            filler_words: Math.max(Number(result.analysis?.filler_words || 0), countFillerWordsInText(recognizedText)),
+            word_count: Math.max(Number(result.analysis?.word_count || 0), recognizedText.length)
+        };
+        updateFluencyMetric(mergedFluency);
+        await analyzeRecognizedText(recognizedText);
+    } catch (error) {
+        console.error('sendAudioToBackend override error:', error);
+        if (liveDraft) {
+            answers[currentIndex] = liveDraft;
+            document.getElementById('answer-text').value = liveDraft;
+        } else {
+            document.getElementById('answer-text').value = '';
+        }
+        alert(`语音识别失败：${error.message}`);
+    }
+}
+// Final override: do not interrupt flow when backend ASR fails but live draft exists.
+async function sendAudioToBackend(base64Audio, liveDraft = '') {
+    try {
+        document.getElementById('answer-text').value = '正在调用科大讯飞 ASR 识别...';
+        const response = await fetch(`${API}/api/interview/asr`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ audio: base64Audio })
+        });
+        const raw = await response.text();
+        let result = {};
+        try {
+            result = raw ? JSON.parse(raw) : {};
+        } catch {
+            throw new Error(`ASR 返回非JSON(${response.status})`);
+        }
+        if (!response.ok || !result.success) {
+            const detail = result.details ? ` | 详情: ${result.details}` : '';
+            throw new Error((result.error || '科大讯飞语音识别失败') + detail);
+        }
+
+        const recognizedText = String(result.text || '').trim();
+        if (!recognizedText) {
+            if (!liveDraft) throw new Error(result.warning || '未识别到有效语音，请重试');
+            answers[currentIndex] = liveDraft;
+            document.getElementById('answer-text').value = liveDraft;
+            const strictFluency = estimateStrictFluency(liveDraft);
+            speechAnalysisList[currentIndex] = {
+                ...(speechAnalysisList[currentIndex] || {}),
+                fluency_score: strictFluency,
+                filler_words: countFillerWordsInText(liveDraft),
+                word_count: liveDraft.length
+            };
+            updateFluencyMetric(strictFluency);
+            await analyzeRecognizedText(liveDraft);
+            return;
+        }
+
+        answers[currentIndex] = recognizedText;
+        document.getElementById('answer-text').value = recognizedText;
+        const strictFluency = estimateStrictFluency(recognizedText);
+        const backendFluency = Number(result.analysis?.fluency_score ?? strictFluency);
+        const mergedFluency = Math.min(strictFluency, backendFluency);
+        speechAnalysisList[currentIndex] = {
+            ...(result.analysis || {}),
+            fluency_score: mergedFluency,
+            filler_words: Math.max(Number(result.analysis?.filler_words || 0), countFillerWordsInText(recognizedText)),
+            word_count: Math.max(Number(result.analysis?.word_count || 0), recognizedText.length)
+        };
+        updateFluencyMetric(mergedFluency);
+        await analyzeRecognizedText(recognizedText);
+    } catch (error) {
+        console.error('sendAudioToBackend final override error:', error);
+        if (liveDraft) {
+            answers[currentIndex] = liveDraft;
+            document.getElementById('answer-text').value = liveDraft;
+            return;
+        }
+        document.getElementById('answer-text').value = '';
+        alert(`语音识别失败：${error.message}`);
+    }
+}
+
+function refreshMetricsForCurrentQuestion() {
+    const fluencyMetric = document.getElementById('m-fluency');
+
+    const faceData = faceSnapshots[currentIndex];
+    if (faceData && typeof faceData === 'object') {
+        updateFaceUI(faceData);
+    }
+
+    const speech = speechAnalysisList[currentIndex];
+    if (speech && speech.fluency_score !== undefined && speech.fluency_score !== null) {
+        updateFluencyMetric(speech.fluency_score);
+    } else {
+        fluencyMetric.textContent = '--';
+        fluencyMetric.className = 'metric-value';
+    }
+}
+
+function showQuestion(index) {
+    currentIndex = index;
+    document.getElementById('q-num').textContent = `问题 ${index + 1}/${questions.length}`;
+    document.getElementById('q-text').textContent = questions[index].question;
+    document.getElementById('answer-text').value = answers[index] || '';
+
+    for (let i = 0; i < questions.length; i += 1) {
+        const dot = document.getElementById(`dot-${i}`);
+        dot.className = `progress-dot${i < index ? ' done' : i === index ? ' active' : ''}`;
+    }
+
+    document.getElementById('btn-prev').disabled = index === 0;
+    document.getElementById('btn-next').classList.toggle('hidden', index === questions.length - 1);
+    document.getElementById('btn-submit').classList.toggle('hidden', index !== questions.length - 1);
+    refreshMetricsForCurrentQuestion();
+}
+
+function updateFaceUI(data) {
+    const overlay = document.getElementById('video-overlay');
+    const dot = document.getElementById('status-dot');
+    const statusText = document.getElementById('face-status-text');
+    const metric = document.getElementById('m-face');
+
+    const compliance = (data && (data.compliance_check || data.compliance)) || {};
+    const faceDetected = data?.face_detected !== false;
+    let coverage = Number(compliance.face_coverage ?? data?.face_coverage ?? 0);
+    if (!Number.isFinite(coverage) || coverage < 0) coverage = 0;
+    if (!faceDetected) coverage = 0;
+
+    const ok = faceDetected && compliance.is_compliant !== false && coverage >= 60;
+    overlay.className = `video-overlay ${ok ? 'compliant' : 'warning'}`;
+    dot.className = `status-dot ${ok ? 'green' : 'yellow'}`;
+    statusText.textContent = ok ? '状态正常' : (faceDetected ? '请调整镜头' : '未检测到人脸');
+    metric.textContent = `${Math.round(coverage)}%`;
+    metric.className = `metric-value ${coverage >= 80 ? 'good' : coverage >= 60 ? 'warn' : 'bad'}`;
+}
+
+function startFaceCaptureLoop() {
+    const video = document.getElementById('webcam');
+    const canvas = document.createElement('canvas');
+    canvas.width = 320;
+    canvas.height = 240;
+    const ctx = canvas.getContext('2d');
+
+    if (faceLoopTimer) clearInterval(faceLoopTimer);
+    faceLoopTimer = setInterval(async () => {
+        if (!video.videoWidth) return;
+
+        try {
+            ctx.drawImage(video, 0, 0, 320, 240);
+            const image = canvas.toDataURL('image/jpeg', 0.75);
+            let result = null;
+
+            // 优先后端检测（更稳定），本地 FaceDetector 只做兜底
+            try {
+                const response = await fetch(`${API}/api/interview/face_detect`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ image })
+                });
+                const raw = await response.text();
+                result = raw ? JSON.parse(raw) : null;
+                if (!response.ok || !result || result.success === false) {
+                    throw new Error((result && result.error) || `face_detect ${response.status}`);
+                }
+            } catch (backendError) {
+                if (localFaceDetector) {
+                    const faces = await localFaceDetector.detect(canvas);
+                    result = buildLocalFaceResult(faces, canvas.width, canvas.height);
+                } else {
+                    throw backendError;
+                }
+            }
+
+            faceDetectFailCount = 0;
+            lastFaceErrorMessage = '';
+            faceSnapshots[currentIndex] = (result && typeof result === 'object') ? result : {};
+            updateFaceUI(faceSnapshots[currentIndex]);
+        } catch (error) {
+            faceDetectFailCount += 1;
+            const msg = error?.message || '检测失败';
+            if (msg !== lastFaceErrorMessage || faceDetectFailCount <= 2) {
+                console.error('startFaceCaptureLoop final override error:', error);
+                lastFaceErrorMessage = msg;
+            }
+            faceSnapshots[currentIndex] = {
+                success: true,
+                face_detected: false,
+                compliance_check: { is_compliant: false, face_coverage: 0 }
+            };
+            updateFaceUI(faceSnapshots[currentIndex]);
+            setFaceStatusWarning(`人脸检测异常：${msg}`);
+        }
+    }, 2000);
+}
+
+async function analyzeRecognizedText(text, questionIndex = currentIndex) {
+    try {
+        const response = await fetch(`${API}/api/interview/analyze_text`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                text,
+                question: questions[questionIndex]?.question || '',
+                job_category: localStorage.getItem('selected_category')
+            })
+        });
+
+        const result = await response.json();
+        if (!response.ok || !result.success) {
+            const detail = result.details ? ` | 详情: ${result.details}` : '';
+            throw new Error((result.error || '文本分析失败') + detail);
+        }
+
+        const existing = speechAnalysisList[questionIndex] || {};
+        const strictFluency = estimateStrictFluency(text);
+        const modelFluency = Number(result.analysis?.fluency_score ?? strictFluency);
+        const mergedFluency = Math.min(strictFluency, modelFluency);
+        speechAnalysisList[questionIndex] = {
+            ...existing,
+            ...result.analysis,
+            filler_words: Math.max(
+                Number(existing.filler_words || 0),
+                Number(result.analysis?.filler_words || 0),
+                countFillerWordsInText(text)
+            ),
+            word_count: Math.max(
+                Number(existing.word_count || 0),
+                Number(result.analysis?.word_count || 0),
+                text.length
+            ),
+            fluency_score: mergedFluency
+        };
+
+        if (questionIndex === currentIndex) {
+            updateFluencyMetric(mergedFluency);
+        }
+    } catch (error) {
+        console.error('analyzeRecognizedText final override error:', error);
+    }
+}
+
+async function sendAudioToBackend(base64Audio, liveDraft = '') {
+    const answerIndex = currentIndex;
+    try {
+        document.getElementById('answer-text').value = '正在调用科大讯飞 ASR 识别...';
+        const response = await fetch(`${API}/api/interview/asr`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ audio: base64Audio })
+        });
+        const raw = await response.text();
+        let result = {};
+        try {
+            result = raw ? JSON.parse(raw) : {};
+        } catch {
+            throw new Error(`ASR 返回非JSON(${response.status})`);
+        }
+        if (!response.ok || !result.success) {
+            const detail = result.details ? ` | 详情: ${result.details}` : '';
+            throw new Error((result.error || '科大讯飞语音识别失败') + detail);
+        }
+
+        const recognizedText = String(result.text || '').trim();
+        if (!recognizedText) {
+            if (!liveDraft) throw new Error(result.warning || '未识别到有效语音，请重试');
+            answers[answerIndex] = liveDraft;
+            if (answerIndex === currentIndex) {
+                document.getElementById('answer-text').value = liveDraft;
+            }
+            const strictFluency = estimateStrictFluency(liveDraft);
+            speechAnalysisList[answerIndex] = {
+                ...(speechAnalysisList[answerIndex] || {}),
+                fluency_score: strictFluency,
+                filler_words: countFillerWordsInText(liveDraft),
+                word_count: liveDraft.length
+            };
+            if (answerIndex === currentIndex) {
+                updateFluencyMetric(strictFluency);
+            }
+            await analyzeRecognizedText(liveDraft, answerIndex);
+            return;
+        }
+
+        answers[answerIndex] = recognizedText;
+        if (answerIndex === currentIndex) {
+            document.getElementById('answer-text').value = recognizedText;
+        }
+        const strictFluency = estimateStrictFluency(recognizedText);
+        const backendFluency = Number(result.analysis?.fluency_score ?? strictFluency);
+        const mergedFluency = Math.min(strictFluency, backendFluency);
+        speechAnalysisList[answerIndex] = {
+            ...(result.analysis || {}),
+            fluency_score: mergedFluency,
+            filler_words: Math.max(Number(result.analysis?.filler_words || 0), countFillerWordsInText(recognizedText)),
+            word_count: Math.max(Number(result.analysis?.word_count || 0), recognizedText.length)
+        };
+        if (answerIndex === currentIndex) {
+            updateFluencyMetric(mergedFluency);
+        }
+        await analyzeRecognizedText(recognizedText, answerIndex);
+    } catch (error) {
+        console.error('sendAudioToBackend index-safe override error:', error);
+        if (liveDraft) {
+            answers[answerIndex] = liveDraft;
+            if (answerIndex === currentIndex) {
+                document.getElementById('answer-text').value = liveDraft;
+            }
+            return;
+        }
+        if (answerIndex === currentIndex) {
+            document.getElementById('answer-text').value = '';
+            alert(`语音识别失败：${error.message}`);
+        }
+    }
+}
+// ---- Final hardening override (ASR UX + face score stability) ----
+let _faceCoverageWindow = [];
+let _faceCoverageSmoothed = 0;
+let _faceDetectBusy = false;
+let _lastFaceUpdateTs = 0;
+let _noFaceStreak = 0;
+let _stableNoFaceFrames = 0;
+let _stableHitFrames = 0;
+let _lastAcceptedCoverage = 0;
+
+function _pushFaceCoverage(v) {
+    const n = Number.isFinite(v) ? v : 0;
+    _faceCoverageWindow.push(Math.max(0, Math.min(100, n)));
+    if (_faceCoverageWindow.length > 2) _faceCoverageWindow.shift();
+}
+
+function _avgFaceCoverage() {
+    if (!_faceCoverageWindow.length) return 0;
+    const s = _faceCoverageWindow.reduce((a, b) => a + b, 0);
+    return s / _faceCoverageWindow.length;
+}
+
+function _getResponsiveCoverage(rawCoverage, detected) {
+    const avg = _avgFaceCoverage();
+    const target = Math.max(0, Math.min(100, rawCoverage * 0.85 + avg * 0.15));
+
+    if (!detected || rawCoverage <= 0) {
+        // Drop almost immediately when face leaves frame.
+        _faceCoverageSmoothed = _faceCoverageSmoothed * 0.10;
+        return Math.round(_faceCoverageSmoothed);
+    }
+
+    // Asymmetric smoothing: drop very fast, rise fast.
+    const alpha = target < _faceCoverageSmoothed ? 0.90 : 0.72;
+    _faceCoverageSmoothed = _faceCoverageSmoothed + (target - _faceCoverageSmoothed) * alpha;
+    return Math.round(Math.max(0, Math.min(100, _faceCoverageSmoothed)));
+}
+
+function refreshMetricsForCurrentQuestion() {
+    const faceData = faceSnapshots[currentIndex];
+    const speechData = speechAnalysisList[currentIndex];
+    if (faceData && typeof faceData === 'object') {
+        updateFaceUI(faceData);
+    }
+
+    if (speechData && speechData.fluency_score !== undefined && speechData.fluency_score !== null) {
+        updateFluencyMetric(speechData.fluency_score);
+    } else {
+        const mFlu = document.getElementById('m-fluency');
+        mFlu.textContent = '--';
+        mFlu.className = 'metric-value';
+    }
+}
+
+function showQuestion(index) {
+    currentIndex = index;
+    document.getElementById('q-num').textContent = `问题 ${index + 1}/${questions.length}`;
+    document.getElementById('q-text').textContent = questions[index].question;
+    document.getElementById('answer-text').value = answers[index] || '';
+    for (let i = 0; i < questions.length; i += 1) {
+        const dot = document.getElementById(`dot-${i}`);
+        dot.className = `progress-dot${i < index ? ' done' : i === index ? ' active' : ''}`;
+    }
+    document.getElementById('btn-prev').disabled = index === 0;
+    document.getElementById('btn-next').classList.toggle('hidden', index === questions.length - 1);
+    document.getElementById('btn-submit').classList.toggle('hidden', index !== questions.length - 1);
+    refreshMetricsForCurrentQuestion();
+}
+
+function updateFaceUI(data) {
+    const overlay = document.getElementById('video-overlay');
+    const dot = document.getElementById('status-dot');
+    const statusText = document.getElementById('face-status-text');
+    const metric = document.getElementById('m-face');
+
+    const compliance = (data && (data.compliance_check || data.compliance)) || {};
+    const source = data?.source || (data?.fallback ? 'fallback' : 'unknown');
+    const detected = data?.face_detected !== false;
+    let coverage = Number(compliance.face_coverage ?? data?.face_coverage ?? 0);
+    if (!Number.isFinite(coverage) || !detected) coverage = 0;
+    _pushFaceCoverage(coverage);
+    const smoothCoverage = _getResponsiveCoverage(coverage, detected);
+
+    const isFrontal = compliance.is_frontal !== false;
+    const isCompliant = compliance.is_compliant !== false && detected;
+    const ok = isCompliant && isFrontal && smoothCoverage >= 60;
+
+    if (overlay) overlay.className = 'video-overlay';
+    if (dot) dot.className = 'status-dot green';
+    if (statusText) statusText.textContent = '';
+    if (metric) {
+        metric.textContent = `${smoothCoverage}%`;
+        metric.className = `metric-value ${smoothCoverage >= 80 ? 'good' : smoothCoverage >= 60 ? 'warn' : 'bad'}`;
+    }
+}
+
+function startFaceCaptureLoop() {
+    const video = document.getElementById('webcam');
+    const canvas = document.createElement('canvas');
+    canvas.width = 320;
+    canvas.height = 240;
+    const ctx = canvas.getContext('2d');
+    _faceCoverageWindow = [];
+    _faceCoverageSmoothed = 0;
+    _faceDetectBusy = false;
+
+    if (faceLoopTimer) clearInterval(faceLoopTimer);
+    faceLoopTimer = setInterval(async () => {
+        if (_faceDetectBusy) return;
+        if (!video.videoWidth) return;
+        _faceDetectBusy = true;
+        try {
+            ctx.drawImage(video, 0, 0, 320, 240);
+            const image = canvas.toDataURL('image/jpeg', 0.8);
+            let result = null;
+
+            try {
+                const response = await fetch(`${API}/api/interview/face_detect`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ image })
+                });
+                const raw = await response.text();
+                result = raw ? JSON.parse(raw) : null;
+                if (!response.ok || !result) throw new Error(`face_detect ${response.status}`);
+            } catch (backendErr) {
+                if (localFaceDetector) {
+                    const faces = await localFaceDetector.detect(canvas);
+                    result = buildLocalFaceResult(faces, canvas.width, canvas.height);
+                    result.source = result.source || 'browser_fallback';
+                } else {
+                    throw backendErr;
+                }
+            }
+
+            if (result && typeof result === 'object') {
+                faceDetectFailCount = 0;
+                lastFaceErrorMessage = '';
+                faceSnapshots[currentIndex] = result;
+                updateFaceUI(result);
+            } else {
+                throw new Error('face result empty');
+            }
+        } catch (error) {
+            faceDetectFailCount += 1;
+            const msg = error?.message || '检测失败';
+            if (msg !== lastFaceErrorMessage || faceDetectFailCount <= 2) {
+                console.error('startFaceCaptureLoop stable override error:', error);
+                lastFaceErrorMessage = msg;
+            }
+            const fail = {
+                success: true,
+                fallback: true,
+                source: 'fallback',
+                face_detected: false,
+                compliance_check: { is_compliant: false, face_coverage: 0, is_frontal: false }
+            };
+            faceSnapshots[currentIndex] = fail;
+            updateFaceUI(fail);
+        } finally {
+            _faceDetectBusy = false;
+        }
+    }, 800);
+}
+
+async function sendAudioToBackend(base64Audio, liveDraft = '') {
+    const answerIndex = currentIndex;
+    try {
+        document.getElementById('answer-text').value = '正在调用科大讯飞 ASR 识别...';
+        const response = await fetch(`${API}/api/interview/asr`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ audio: base64Audio })
+        });
+        const raw = await response.text();
+        let result = {};
+        try {
+            result = raw ? JSON.parse(raw) : {};
+        } catch {
+            throw new Error(`ASR 返回非JSON(${response.status})`);
+        }
+
+        if (!response.ok || !result.success) {
+            const detail = result.details ? ` | 详情: ${result.details}` : '';
+            throw new Error((result.error || '科大讯飞语音识别失败') + detail);
+        }
+
+        const recognizedText = String(result.text || '').trim();
+        if (!recognizedText) {
+            if (liveDraft) {
+                answers[answerIndex] = liveDraft;
+                const msg = `⚠ 讯飞未识别到有效语音，已保留实时草稿：\n\n${liveDraft}`;
+                if (answerIndex === currentIndex) {
+                    document.getElementById('answer-text').value = msg;
+                }
+                const strictFluency = estimateStrictFluency(liveDraft);
+                speechAnalysisList[answerIndex] = {
+                    ...(speechAnalysisList[answerIndex] || {}),
+                    fluency_score: strictFluency,
+                    filler_words: countFillerWordsInText(liveDraft),
+                    word_count: liveDraft.length
+                };
+                if (answerIndex === currentIndex) updateFluencyMetric(strictFluency);
+                await analyzeRecognizedText(liveDraft, answerIndex);
+                return;
+            }
+            throw new Error(result.warning || '未识别到有效语音，请靠近麦克风并增大音量重试');
+        }
+
+        answers[answerIndex] = recognizedText;
+        if (answerIndex === currentIndex) {
+            document.getElementById('answer-text').value = recognizedText;
+        }
+        const strictFluency = estimateStrictFluency(recognizedText);
+        const backendFluency = Number(result.analysis?.fluency_score ?? strictFluency);
+        const mergedFluency = Math.min(strictFluency, backendFluency);
+        speechAnalysisList[answerIndex] = {
+            ...(result.analysis || {}),
+            fluency_score: mergedFluency,
+            filler_words: Math.max(Number(result.analysis?.filler_words || 0), countFillerWordsInText(recognizedText)),
+            word_count: Math.max(Number(result.analysis?.word_count || 0), recognizedText.length)
+        };
+        if (answerIndex === currentIndex) updateFluencyMetric(mergedFluency);
+        await analyzeRecognizedText(recognizedText, answerIndex);
+    } catch (error) {
+        console.error('sendAudioToBackend final-stable override error:', error);
+        if (liveDraft) {
+            answers[answerIndex] = liveDraft;
+            if (answerIndex === currentIndex) {
+                document.getElementById('answer-text').value = `⚠ ASR失败，已保留实时草稿：\n\n${liveDraft}`;
+            }
+            return;
+        }
+        if (answerIndex === currentIndex) {
+            document.getElementById('answer-text').value = '';
+            alert(`语音识别失败：${error.message}`);
+        }
+    }
+}
+// ---- Ultra responsive face loop override ----
+function _getResponsiveCoverage(rawCoverage, detected) {
+    const avg = _avgFaceCoverage();
+    const target = Math.max(0, Math.min(100, rawCoverage * 0.92 + avg * 0.08));
+    if (!detected || rawCoverage <= 0) {
+        _faceCoverageSmoothed = _faceCoverageSmoothed * 0.04;
+        return Math.round(_faceCoverageSmoothed);
+    }
+    const alpha = target < _faceCoverageSmoothed ? 0.92 : 0.82;
+    _faceCoverageSmoothed = _faceCoverageSmoothed + (target - _faceCoverageSmoothed) * alpha;
+    return Math.round(Math.max(0, Math.min(100, _faceCoverageSmoothed)));
+}
+
+function _renderFaceByCoverage(smoothCoverage, source, detected, isFrontal, isCompliant) {
+    const overlay = document.getElementById('video-overlay');
+    const dot = document.getElementById('status-dot');
+    const statusText = document.getElementById('face-status-text');
+    const metric = document.getElementById('m-face');
+    if (overlay) overlay.className = 'video-overlay';
+    if (dot) dot.className = 'status-dot green';
+    if (statusText) statusText.textContent = '';
+    if (metric) {
+        metric.textContent = `${smoothCoverage}%`;
+        metric.className = `metric-value ${smoothCoverage >= 80 ? 'good' : smoothCoverage >= 60 ? 'warn' : 'bad'}`;
+    }
+}
+
+function updateFaceUI(data) {
+    const compliance = (data && (data.compliance_check || data.compliance)) || {};
+    const source = data?.source || (data?.fallback ? 'fallback' : 'unknown');
+    let detected = data?.face_detected !== false;
+    let coverage = Number(compliance.face_coverage ?? data?.face_coverage ?? 0);
+    if (!Number.isFinite(coverage)) coverage = 0;
+
+    if (!detected || coverage <= 0) {
+        _noFaceStreak += 1;
+        _stableNoFaceFrames += 1;
+        _stableHitFrames = 0;
+        // Tolerate several missed frames before declaring no-face.
+        if (_stableNoFaceFrames <= 4 && _lastAcceptedCoverage > 0) {
+            detected = true;
+            coverage = _lastAcceptedCoverage;
+        } else if (_noFaceStreak <= 2) {
+            detected = true;
+            coverage = Math.max(0, _faceCoverageSmoothed);
+        } else {
+            coverage = 0;
+        }
+    } else {
+        _noFaceStreak = 0;
+        _stableNoFaceFrames = 0;
+        _stableHitFrames += 1;
+
+        // Clamp sudden frame-to-frame jumps even when detected.
+        if (_lastAcceptedCoverage > 0) {
+            const diff = coverage - _lastAcceptedCoverage;
+            if (Math.abs(diff) > 18) {
+                coverage = _lastAcceptedCoverage + Math.sign(diff) * 12;
+            }
+        }
+    }
+
+    _pushFaceCoverage(coverage);
+    const smoothCoverage = _getResponsiveCoverage(coverage, detected);
+    const isFrontal = compliance.is_frontal !== false;
+    const isCompliant = compliance.is_compliant !== false && detected;
+    if (detected && smoothCoverage > 0) {
+        _lastAcceptedCoverage = smoothCoverage;
+    } else if (!detected && _stableNoFaceFrames > 4) {
+        _lastAcceptedCoverage = 0;
+    }
+    _renderFaceByCoverage(smoothCoverage, source, detected, isFrontal, isCompliant);
+}
+
+function startFaceCaptureLoop() {
+    const video = document.getElementById('webcam');
+    const canvas = document.createElement('canvas');
+    canvas.width = 256;
+    canvas.height = 192;
+    const ctx = canvas.getContext('2d');
+    _faceCoverageWindow = [];
+    _faceCoverageSmoothed = 0;
+    _faceDetectBusy = false;
+    _lastFaceUpdateTs = Date.now();
+    _noFaceStreak = 0;
+    _stableNoFaceFrames = 0;
+    _stableHitFrames = 0;
+    _lastAcceptedCoverage = 0;
+
+    if (faceLoopTimer) clearInterval(faceLoopTimer);
+    faceLoopTimer = setInterval(async () => {
+        if (_faceDetectBusy) {
+            // Do not aggressively decay while waiting backend; only decay if stale for long.
+            const now = Date.now();
+            if (now - _lastFaceUpdateTs > 1200) {
+                _faceCoverageSmoothed = _faceCoverageSmoothed * 0.82;
+                _renderFaceByCoverage(Math.round(_faceCoverageSmoothed), 'pending', _faceCoverageSmoothed > 1, true, _faceCoverageSmoothed >= 35);
+            }
+            return;
+        }
+        if (!video.videoWidth) return;
+        _faceDetectBusy = true;
+        try {
+            ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+            const image = canvas.toDataURL('image/jpeg', 0.65);
+            let result = null;
+            try {
+                const response = await fetch(`${API}/api/interview/face_detect`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ image })
+                });
+                const raw = await response.text();
+                result = raw ? JSON.parse(raw) : null;
+                if (!response.ok || !result) throw new Error(`face_detect ${response.status}`);
+            } catch (backendErr) {
+                if (localFaceDetector) {
+                    const faces = await localFaceDetector.detect(canvas);
+                    result = buildLocalFaceResult(faces, canvas.width, canvas.height);
+                    result.source = result.source || 'browser_fallback';
+                } else {
+                    throw backendErr;
+                }
+            }
+
+            if (result && typeof result === 'object') {
+                faceDetectFailCount = 0;
+                lastFaceErrorMessage = '';
+                faceSnapshots[currentIndex] = result;
+                updateFaceUI(result);
+                _lastFaceUpdateTs = Date.now();
+            } else {
+                throw new Error('face result empty');
+            }
+        } catch (error) {
+            faceDetectFailCount += 1;
+            const msg = error?.message || '检测失败';
+            if (msg !== lastFaceErrorMessage || faceDetectFailCount <= 2) {
+                console.error('startFaceCaptureLoop ultra override error:', error);
+                lastFaceErrorMessage = msg;
+            }
+            const fail = {
+                success: true,
+                fallback: true,
+                source: 'fallback',
+                face_detected: false,
+                compliance_check: { is_compliant: false, face_coverage: 0, is_frontal: false }
+            };
+            faceSnapshots[currentIndex] = fail;
+            updateFaceUI(fail);
+            _lastFaceUpdateTs = Date.now();
+        } finally {
+            _faceDetectBusy = false;
+        }
+    }, 300);
+}
+
+// ---- Stable face tracking override ----
+let _faceLockedCoverage = 0;
+let _faceLostFrames = 0;
+let _faceSeenFrames = 0;
+
+function _clampFaceStep(targetCoverage) {
+    if (_faceLockedCoverage <= 0) {
+        return Math.round(targetCoverage);
+    }
+
+    const diff = targetCoverage - _faceLockedCoverage;
+    const maxRise = 8;
+    const maxDrop = 5;
+    const step = Math.max(-maxDrop, Math.min(maxRise, diff));
+    return Math.round(Math.max(0, Math.min(100, _faceLockedCoverage + step)));
+}
+
+function updateFaceUI(data) {
+    const compliance = (data && (data.compliance_check || data.compliance)) || {};
+    const source = data?.source || (data?.fallback ? 'fallback' : 'unknown');
+    const rawDetected = data?.face_detected !== false;
+    let rawCoverage = Number(compliance.face_coverage ?? data?.face_coverage ?? 0);
+    if (!Number.isFinite(rawCoverage)) rawCoverage = 0;
+
+    const isFrontal = compliance.is_frontal !== false;
+    const centerOffsetX = Number(data?.center_offset?.x ?? 0);
+    const centerOffsetY = Number(data?.center_offset?.y ?? 0);
+    const faceBox = data?.face_box || {};
+    const frameSize = data?.frame_size || {};
+    const boxX = Number(faceBox.x ?? 0);
+    const boxY = Number(faceBox.y ?? 0);
+    const boxW = Number(faceBox.w ?? 0);
+    const boxH = Number(faceBox.h ?? 0);
+    const frameW = Number(frameSize.w ?? 0);
+    const frameH = Number(frameSize.h ?? 0);
+    const touchesEdge = frameW > 0 && frameH > 0 && (
+        boxX <= frameW * 0.08 ||
+        boxY <= frameH * 0.06 ||
+        (boxX + boxW) >= frameW * 0.92 ||
+        (boxY + boxH) >= frameH * 0.94
+    );
+
+    if (touchesEdge) {
+        rawCoverage = Math.min(rawCoverage, 24);
+    }
+    if (centerOffsetX > 0.30 || centerOffsetY > 0.30) {
+        rawCoverage = Math.min(rawCoverage, 36);
+    }
+
+    const reallyDetected = rawDetected && rawCoverage > 0 && !touchesEdge;
+
+    if (reallyDetected) {
+        _faceLostFrames = 0;
+        _faceSeenFrames += 1;
+
+        // 原始人脸检测值容易抖动，这里只允许小步变化。
+        let stabilized = _clampFaceStep(rawCoverage);
+        if (_faceSeenFrames <= 2) {
+            stabilized = Math.round((_faceLockedCoverage + rawCoverage) / (_faceLockedCoverage > 0 ? 2 : 1));
+        }
+
+        if (_faceLockedCoverage > 0 && Math.abs(rawCoverage - _faceLockedCoverage) <= 6) {
+            stabilized = Math.round(_faceLockedCoverage * 0.78 + rawCoverage * 0.22);
+        }
+
+        _faceLockedCoverage = Math.max(0, Math.min(100, stabilized));
+    } else {
+        _faceLostFrames += 1;
+        _faceSeenFrames = 0;
+
+        // 短时丢帧先稳住，不要立刻掉分。
+        if (_faceLostFrames <= 6 && _faceLockedCoverage > 0) {
+            // keep
+        } else if (_faceLostFrames <= 10 && _faceLockedCoverage > 0) {
+            _faceLockedCoverage = Math.round(_faceLockedCoverage * 0.95);
+        } else {
+            _faceLockedCoverage = Math.round(_faceLockedCoverage * 0.78);
+        }
+    }
+
+    const smoothCoverage = Math.max(0, Math.min(100, Math.round(_faceLockedCoverage)));
+    const detected = smoothCoverage > 8;
+    const isCompliant = compliance.is_compliant !== false && detected && isFrontal && smoothCoverage >= 42;
+    _renderFaceByCoverage(smoothCoverage, source, detected, isFrontal, isCompliant);
+}
+
+function startFaceCaptureLoop() {
+    const video = document.getElementById('webcam');
+    const canvas = document.createElement('canvas');
+    canvas.width = 256;
+    canvas.height = 192;
+    const ctx = canvas.getContext('2d');
+
+    _faceCoverageWindow = [];
+    _faceCoverageSmoothed = 0;
+    _faceDetectBusy = false;
+    _lastFaceUpdateTs = Date.now();
+    _noFaceStreak = 0;
+    _stableNoFaceFrames = 0;
+    _stableHitFrames = 0;
+    _lastAcceptedCoverage = 0;
+    _faceLockedCoverage = 0;
+    _faceLostFrames = 0;
+    _faceSeenFrames = 0;
+
+    if (faceLoopTimer) clearInterval(faceLoopTimer);
+    faceLoopTimer = setInterval(async () => {
+        if (_faceDetectBusy || !video.videoWidth) return;
+
+        _faceDetectBusy = true;
+        try {
+            ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+            const image = canvas.toDataURL('image/jpeg', 0.7);
+            let result = null;
+
+            try {
+                const response = await fetch(`${API}/api/interview/face_detect`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ image })
+                });
+                const raw = await response.text();
+                result = raw ? JSON.parse(raw) : null;
+                if (!response.ok || !result) throw new Error(`face_detect ${response.status}`);
+            } catch (backendErr) {
+                if (localFaceDetector) {
+                    const faces = await localFaceDetector.detect(canvas);
+                    result = buildLocalFaceResult(faces, canvas.width, canvas.height);
+                    result.source = result.source || 'browser_fallback';
+                } else {
+                    throw backendErr;
+                }
+            }
+
+            if (!result || typeof result !== 'object') {
+                throw new Error('face result empty');
+            }
+
+            faceDetectFailCount = 0;
+            lastFaceErrorMessage = '';
+            faceSnapshots[currentIndex] = result;
+            updateFaceUI(result);
+            _lastFaceUpdateTs = Date.now();
+        } catch (error) {
+            faceDetectFailCount += 1;
+            const msg = error?.message || '检测失败';
+            if (msg !== lastFaceErrorMessage || faceDetectFailCount <= 2) {
+                console.error('startFaceCaptureLoop stable override error:', error);
+                lastFaceErrorMessage = msg;
+            }
+
+            updateFaceUI({
+                success: true,
+                fallback: true,
+                source: 'fallback',
+                face_detected: false,
+                compliance_check: { is_compliant: false, face_coverage: 0, is_frontal: false }
+            });
+            _lastFaceUpdateTs = Date.now();
+        } finally {
+            _faceDetectBusy = false;
+        }
+    }, 420);
+}
+
+// ---- Subject-aware face tracking override ----
+function updateFaceUI(data) {
+    const compliance = (data && (data.compliance_check || data.compliance)) || {};
+    const source = data?.source || (data?.fallback ? 'fallback' : 'unknown');
+    const rawDetected = data?.face_detected !== false;
+    let rawCoverage = Number(compliance.face_coverage ?? data?.face_coverage ?? 0);
+    if (!Number.isFinite(rawCoverage)) rawCoverage = 0;
+
+    const faceBox = data?.face_box || {};
+    const frameSize = data?.frame_size || {};
+    const frameW = Number(frameSize.w ?? 0);
+    const frameH = Number(frameSize.h ?? 0);
+    const boxX = Number(faceBox.x ?? 0);
+    const boxY = Number(faceBox.y ?? 0);
+    const boxW = Number(faceBox.w ?? 0);
+    const boxH = Number(faceBox.h ?? 0);
+    const boxAreaPct = frameW > 0 && frameH > 0 ? (boxW * boxH) / (frameW * frameH) * 100 : 0;
+    const centerOffsetX = Number(data?.center_offset?.x ?? 0);
+    const centerOffsetY = Number(data?.center_offset?.y ?? 0);
+    const isFrontal = compliance.is_frontal !== false;
+
+    const touchesEdge = frameW > 0 && frameH > 0 && (
+        boxX <= frameW * 0.06 ||
+        boxY <= frameH * 0.05 ||
+        (boxX + boxW) >= frameW * 0.94 ||
+        (boxY + boxH) >= frameH * 0.95
+    );
+
+    const likelyBackgroundFace =
+        boxAreaPct > 0 &&
+        (boxAreaPct < 7.5 || centerOffsetY < 0.04 || boxY < frameH * 0.16);
+
+    let reallyDetected = rawDetected && rawCoverage > 0 && !touchesEdge;
+
+    if (touchesEdge) {
+        rawCoverage = Math.min(rawCoverage, 12);
+        reallyDetected = false;
+    } else if (likelyBackgroundFace) {
+        rawCoverage = Math.min(rawCoverage, 18);
+        reallyDetected = false;
+    } else if (centerOffsetX > 0.28 || centerOffsetY > 0.26) {
+        rawCoverage = Math.min(rawCoverage, 34);
+    }
+
+    if (reallyDetected) {
+        _faceLostFrames = 0;
+        _faceSeenFrames += 1;
+
+        let stabilized = _clampFaceStep(rawCoverage);
+        if (_faceSeenFrames <= 2) {
+            stabilized = Math.round((_faceLockedCoverage + rawCoverage) / (_faceLockedCoverage > 0 ? 2 : 1));
+        }
+
+        if (_faceLockedCoverage > 0) {
+            const diff = rawCoverage - _faceLockedCoverage;
+            if (diff < -18) {
+                stabilized = Math.round(_faceLockedCoverage + diff * 0.72);
+            } else if (Math.abs(diff) <= 6) {
+                stabilized = Math.round(_faceLockedCoverage * 0.76 + rawCoverage * 0.24);
+            }
+        }
+
+        _faceLockedCoverage = Math.max(0, Math.min(100, stabilized));
+    } else {
+        _faceLostFrames += 1;
+        _faceSeenFrames = 0;
+
+        // 主脸消失后快速掉分，不再长时间维持旧高分。
+        if (_faceLostFrames <= 2 && _faceLockedCoverage > 0) {
+            _faceLockedCoverage = Math.round(_faceLockedCoverage * 0.72);
+        } else if (_faceLostFrames <= 5 && _faceLockedCoverage > 0) {
+            _faceLockedCoverage = Math.round(_faceLockedCoverage * 0.52);
+        } else {
+            _faceLockedCoverage = Math.round(_faceLockedCoverage * 0.28);
+        }
+    }
+
+    const smoothCoverage = Math.max(0, Math.min(100, Math.round(_faceLockedCoverage)));
+    const detected = smoothCoverage > 8 && reallyDetected;
+    const isCompliant = compliance.is_compliant !== false && detected && isFrontal && smoothCoverage >= 42;
+    _renderFaceByCoverage(smoothCoverage, source, detected, isFrontal, isCompliant);
+}
+</script>
+</body>
+</html>

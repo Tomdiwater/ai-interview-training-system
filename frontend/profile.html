@@ -1,0 +1,412 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>面试单元 - 个人中心</title>
+    <link rel="stylesheet" href="css/style.css">
+    <style>
+        .profile-shell {
+            display: grid;
+            grid-template-columns: minmax(0, 1fr) 320px;
+            gap: 24px;
+            align-items: start;
+            margin-top: 18px;
+        }
+
+        .profile-main {
+            min-width: 0;
+        }
+
+        .profile-card,
+        .stats-card,
+        .side-panel {
+            background: var(--surface);
+            backdrop-filter: blur(18px);
+            border: 1px solid rgba(255, 255, 255, 0.64);
+            border-radius: 30px;
+            box-shadow: var(--shadow-sm);
+            padding: 30px;
+        }
+
+        .profile-card {
+            position: relative;
+            overflow: hidden;
+        }
+
+        .profile-card::before {
+            content: "";
+            position: absolute;
+            inset: 0;
+            background:
+                radial-gradient(circle at top right, rgba(216, 111, 69, 0.14), transparent 30%),
+                radial-gradient(circle at 15% 18%, rgba(31, 109, 103, 0.12), transparent 24%);
+            pointer-events: none;
+        }
+
+        .profile-card > * {
+            position: relative;
+            z-index: 1;
+        }
+
+        .profile-top {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            margin-bottom: 28px;
+            flex-wrap: wrap;
+        }
+
+        .profile-avatar {
+            width: 96px;
+            height: 96px;
+            border-radius: 28px;
+            background: linear-gradient(135deg, #d86f45, #1f6d67);
+            color: #fff8f2;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 36px;
+            font-weight: 800;
+            box-shadow: 0 18px 34px rgba(31, 37, 35, 0.18);
+        }
+
+        .profile-meta h1 {
+            font-family: "Noto Serif SC", "Source Han Serif SC", serif;
+            font-size: clamp(34px, 5vw, 48px);
+            line-height: 1.1;
+            margin-bottom: 10px;
+        }
+
+        .profile-meta p {
+            color: var(--text-muted);
+        }
+
+        .message {
+            margin-bottom: 18px;
+            padding: 14px 16px;
+            border-radius: 18px;
+            font-weight: 600;
+        }
+
+        .success-message {
+            background: rgba(47, 143, 91, 0.12);
+            color: var(--success);
+        }
+
+        .error-message {
+            background: rgba(203, 75, 75, 0.12);
+            color: var(--error);
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        .form-grid {
+            display: grid;
+            gap: 18px;
+        }
+
+        .button-area {
+            display: flex;
+            gap: 12px;
+            margin-top: 6px;
+            flex-wrap: wrap;
+        }
+
+        .stats-card {
+            margin-top: 24px;
+            overflow: hidden;
+        }
+
+        .stats-card h2,
+        .side-panel h2 {
+            font-size: 18px;
+            margin-bottom: 16px;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 16px;
+        }
+
+        .stat-item {
+            min-width: 0;
+            min-height: 112px;
+            padding: 20px;
+            border-radius: 22px;
+            background: rgba(255, 255, 255, 0.74);
+        }
+
+        .stat-value {
+            display: block;
+            font-size: 34px;
+            font-weight: 800;
+            line-height: 1;
+            color: var(--accent-deep);
+        }
+
+        .stat-label {
+            margin-top: 10px;
+            color: var(--text-muted);
+            font-size: 13px;
+        }
+
+        .side-panel {
+            display: grid;
+            gap: 14px;
+            align-content: start;
+        }
+
+        .side-item {
+            padding: 16px 18px;
+            border-radius: 20px;
+            background: rgba(255, 255, 255, 0.72);
+        }
+
+        .side-item strong {
+            display: block;
+            margin-bottom: 4px;
+            font-size: 15px;
+        }
+
+        .side-item span {
+            color: var(--text-muted);
+            font-size: 13px;
+            line-height: 1.65;
+        }
+
+        @media (max-width: 1280px) {
+            .profile-shell {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 720px) {
+            .profile-card,
+            .stats-card,
+            .side-panel {
+                padding: 22px;
+                border-radius: 24px;
+            }
+
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="page-container">
+        <nav class="navbar">
+            <a href="home.html" class="navbar-brand">面试单元</a>
+            <ul class="navbar-nav">
+                <li><a href="home.html" class="nav-link">首页</a></li>
+                <li><a href="job_selection.html" class="nav-link">开始面试</a></li>
+                <li><a href="question_bank.html" class="nav-link">题库</a></li>
+                <li><a href="history.html" class="nav-link">历史记录</a></li>
+                <li><a href="profile.html" class="nav-link active">个人中心</a></li>
+                <li><a href="#" class="nav-link" onclick="logout()">退出登录</a></li>
+            </ul>
+        </nav>
+
+        <div class="content">
+            <div class="profile-shell">
+                <div class="profile-main">
+                    <section class="profile-card">
+                        <div class="profile-top">
+                            <div class="profile-avatar" id="profile-avatar"></div>
+                            <div class="profile-meta">
+                                <h1 id="profile-username">加载中</h1>
+                                <p id="profile-email">user@example.com</p>
+                            </div>
+                        </div>
+
+                        <div class="message hidden" id="message"></div>
+
+                        <form id="profile-form">
+                            <div class="form-grid">
+                                <div class="form-group">
+                                    <label for="email">邮箱</label>
+                                    <input type="email" id="email" name="email" value="user@example.com" required>
+                                </div>
+                            </div>
+
+                            <div class="button-area">
+                                <button type="submit" class="btn-primary">保存修改</button>
+                                <button type="button" class="btn-secondary" onclick="cancelEdit()">取消</button>
+                            </div>
+                        </form>
+                    </section>
+
+                    <section class="stats-card">
+                        <h2>训练概览</h2>
+                        <div class="stats-grid">
+                            <div class="stat-item">
+                                <span class="stat-value" id="interview-count">--</span>
+                                <div class="stat-label">已完成面试</div>
+                            </div>
+                            <div class="stat-item">
+                                <span class="stat-value" id="average-score">--</span>
+                                <div class="stat-label">平均得分</div>
+                            </div>
+                            <div class="stat-item">
+                                <span class="stat-value" id="highest-score">--</span>
+                                <div class="stat-label">最高分</div>
+                            </div>
+                            <div class="stat-item">
+                                <span class="stat-value" id="practice-days">--</span>
+                                <div class="stat-label">累计练习天数</div>
+                            </div>
+                        </div>
+                    </section>
+                </div>
+
+                <aside class="side-panel">
+                    <h2>使用建议</h2>
+                    <div class="side-item">
+                        <strong>完善邮箱</strong>
+                        <span>保持邮箱可用，方便以后找回账号和接收重要通知。</span>
+                    </div>
+                    <div class="side-item">
+                        <strong>查看历史记录</strong>
+                        <span>想看每次面试的得分和回答内容，可以去历史记录里查看。</span>
+                    </div>
+                    <div class="side-item">
+                        <strong>继续练习</strong>
+                        <span>如果分数不稳定，可以选择同一个岗位再练几次。</span>
+                    </div>
+                </aside>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/auth.js"></script>
+    <script>
+        const API = 'http://127.0.0.1:5000';
+
+        window.onload = async function () {
+            const userId = checkLogin();
+            const username = localStorage.getItem('username') || '访客';
+            document.getElementById('profile-username').textContent = username;
+            document.getElementById('profile-avatar').textContent = username.charAt(0).toUpperCase();
+            await loadTrainingOverview(userId);
+        };
+
+        async function loadTrainingOverview(userId) {
+            if (!userId) {
+                setTrainingOverview();
+                return;
+            }
+
+            try {
+                const response = await fetch(`${API}/api/history/${userId}`);
+                const data = await response.json();
+                if (!response.ok) throw new Error(data.error || '训练概览加载失败');
+
+                const records = Array.isArray(data.records) ? data.records : [];
+                const scores = records
+                    .map((record) => Number(record.total_score))
+                    .filter((score) => Number.isFinite(score));
+
+                const interviewCount = records.length;
+                const averageScore = scores.length
+                    ? Math.round(scores.reduce((sum, score) => sum + score, 0) / scores.length)
+                    : 0;
+                const highestScore = scores.length ? Math.max(...scores) : 0;
+                const practiceDays = countPracticeDays(records);
+
+                setTrainingOverview({
+                    interviewCount,
+                    averageScore,
+                    highestScore,
+                    practiceDays
+                });
+            } catch (error) {
+                console.error('加载训练概览失败:', error);
+                setTrainingOverview();
+            }
+        }
+
+        function countPracticeDays(records) {
+            const dates = new Set();
+            records.forEach((record) => {
+                if (!record.created_at) return;
+                const date = new Date(record.created_at);
+                if (Number.isNaN(date.getTime())) return;
+                dates.add(formatLocalDate(date));
+            });
+            return dates.size;
+        }
+
+        function formatLocalDate(date) {
+            const year = date.getFullYear();
+            const month = String(date.getMonth() + 1).padStart(2, '0');
+            const day = String(date.getDate()).padStart(2, '0');
+            return `${year}-${month}-${day}`;
+        }
+
+        function setTrainingOverview(stats = {}) {
+            const {
+                interviewCount = 0,
+                averageScore = 0,
+                highestScore = 0,
+                practiceDays = 0
+            } = stats;
+
+            document.getElementById('interview-count').textContent = interviewCount;
+            document.getElementById('average-score').textContent = averageScore;
+            document.getElementById('highest-score').textContent = highestScore;
+            document.getElementById('practice-days').textContent = practiceDays;
+        }
+
+        document.getElementById('profile-form').addEventListener('submit', async function (e) {
+            e.preventDefault();
+
+            const email = document.getElementById('email').value;
+            const userId = localStorage.getItem('user_id');
+
+            try {
+                const response = await fetch(`${window.location.protocol}//${window.location.hostname}:5000/api/user/${userId}`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email })
+                });
+
+                const data = await response.json();
+                if (response.ok) {
+                    document.getElementById('profile-email').textContent = email;
+                    showMessage('资料已更新。', false);
+                } else {
+                    showMessage(data.error || '保存失败，请稍后重试。', true);
+                }
+            } catch (error) {
+                console.error('保存失败:', error);
+                showMessage('保存失败，请稍后重试。', true);
+            }
+        });
+
+        function showMessage(message, isError) {
+            const element = document.getElementById('message');
+            element.textContent = message;
+            element.className = isError ? 'message error-message' : 'message success-message';
+            element.classList.remove('hidden');
+            setTimeout(() => {
+                element.classList.add('hidden');
+            }, 3000);
+        }
+
+        function cancelEdit() {
+            document.getElementById('email').value = document.getElementById('profile-email').textContent || 'user@example.com';
+        }
+
+        function logout() {
+            localStorage.removeItem('user_id');
+            localStorage.removeItem('username');
+            window.location.href = '/frontend/index.html';
+        }
+    </script>
+</body>
+</html>

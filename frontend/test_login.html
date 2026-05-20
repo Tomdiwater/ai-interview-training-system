@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>登录测试</title>
+</head>
+<body>
+    <h1>登录测试</h1>
+    <form id="testForm">
+        <input type="text" id="username" placeholder="用户名" value="testuser"><br>
+        <input type="password" id="password" placeholder="密码" value="test123"><br>
+        <button type="submit">登录</button>
+    </form>
+    <div id="result"></div>
+
+    <script>
+        // 获取API基础URL
+        function getApiBaseUrl() {
+            const currentProtocol = window.location.protocol;
+            const currentHost = window.location.hostname;
+            return `${currentProtocol}//${currentHost}:5000`;
+        }
+
+        document.getElementById('testForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+            const apiUrl = `${getApiBaseUrl()}/api/login`;
+            
+            try {
+                document.getElementById('result').textContent = '正在登录...';
+                
+                const response = await fetch(apiUrl, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ username, password })
+                });
+                
+                const data = await response.json();
+                
+                if (response.ok) {
+                    document.getElementById('result').textContent = '登录成功！用户ID: ' + data.user_id;
+                } else {
+                    document.getElementById('result').textContent = '登录失败: ' + data.error;
+                }
+            } catch (error) {
+                document.getElementById('result').textContent = '错误: ' + error.message;
+                console.error('登录失败:', error);
+            }
+        });
+    </script>
+</body>
+</html>
